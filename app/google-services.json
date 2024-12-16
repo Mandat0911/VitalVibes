@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348947053887",
+    "project_id": "vitalvibes-5b072",
+    "storage_bucket": "vitalvibes-5b072.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348947053887:android:ca05dbb4e374a138d7a78a",
+        "android_client_info": {
+          "package_name": "com.example.vitalvibes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWVh79D29WeNhdzly1cFecGeGcGDaKcaM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
