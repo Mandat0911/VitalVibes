@@ -69,6 +69,7 @@ public class SignupActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Firebase Authentication successful, create user in Firebase Database
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                            firebaseUser.sendEmailVerification();
                             String userId = firebaseUser.getUid();  // Get Firebase UID
 
                             // Hash the password (optional, you can store password as is)
@@ -89,7 +90,9 @@ public class SignupActivity extends AppCompatActivity {
                                         if (task1.isSuccessful()) {
                                             Toast.makeText(this, "Sign-up successful!", Toast.LENGTH_SHORT).show();
                                             // Redirect to login page
-                                            startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+                                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            startActivity(intent);
                                             finish();
                                         } else {
                                             Toast.makeText(this, "Sign-up failed: " + task1.getException().getMessage(), Toast.LENGTH_SHORT).show();

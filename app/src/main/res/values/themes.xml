@@ -6,4 +6,9 @@
     </style>
 
     <style name="Theme.VitalVibes" parent="Base.Theme.VitalVibes" />
+    <style name="circleImage">
+        <item name="cornerSize">50%</item>
+        <item name="cornerFamily">rounded</item>
+
+    </style>
 </resources>

@@ -123,7 +123,7 @@
                 android:drawablePadding="16dp"
                 android:ems="10"
                 android:hint="Password"
-                android:inputType="textPersonName"
+                android:inputType="textPassword"
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 
@@ -139,7 +139,7 @@
                 android:drawablePadding="16dp"
                 android:ems="10"
                 android:hint="Confirm password"
-                android:inputType="textPersonName"
+                android:inputType="textPassword"
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 
