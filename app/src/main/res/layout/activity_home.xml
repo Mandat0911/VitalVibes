@@ -76,12 +76,17 @@
                 android:hint="Blood Donation location"
                 android:background="@drawable/search_bg"/>
 
-            <ImageView
-                android:id="@+id/imageView6"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:srcCompat="@drawable/banner" />
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imageView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/banner"
+                    tools:layout_editor_absoluteY="16dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -95,10 +100,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Nearby Hospital"
+                    android:text="Highlighted Hospital"
                     android:textColor="@color/black"
-                    android:textStyle="bold"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/SeeAll"
@@ -122,7 +127,7 @@
                 </androidx.recyclerview.widget.RecyclerView>
 
                 <ProgressBar
-                    android:id="@+id/progressBar"
+                    android:id="@+id/progressBarCategory"
                     style="?android:attr/progressBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -135,20 +140,21 @@
         </LinearLayout>
     </ScrollView>
 
-    <com.ismaeldivita.chipnavigation.ChipNavigationBar
+   <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="wrap_content"
+        app:cnb_menuResource="@menu/menu_bottom"
         android:background="@color/white"
         android:elevation="3dp"
         android:padding="8dp"
         app:cnb_iconSize="20sp"
-        app:cnb_iconColor="@color/darkGreen"
-        app:cnb_menuResource="@menu/menu_bottom"
+        app:cnb_iconColor="@color/black"
         app:cnb_orientationMode="horizontal"
         app:cnb_radius="50dp"
-        app:cnb_unselectedColor="@color/grey"
+        app:cnb_unselectedColor="@color/darkGreen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

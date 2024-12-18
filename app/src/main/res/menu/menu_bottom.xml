@@ -5,7 +5,7 @@
         android:id="@+id/home"
         android:icon="@drawable/bottom_btn1"
         android:title="Home"
-        app:cnb_backgroundColor="@color/darkGreen"
+        app:cnb_backgroundColor="@color/black"
         app:cnb_iconColor="@color/white"
         />
 
@@ -13,7 +13,7 @@
         android:id="@+id/createSite"
         android:icon="@android:drawable/ic_menu_add"
         android:title="Create"
-        app:cnb_backgroundColor="@color/darkGreen"
+        app:cnb_backgroundColor="@color/black"
         app:cnb_iconColor="@color/white"
         />
 
@@ -21,7 +21,7 @@
         android:id="@+id/location"
         android:icon="@drawable/location"
         android:title="Location"
-        app:cnb_backgroundColor="@color/darkGreen"
+        app:cnb_backgroundColor="@color/black"
         app:cnb_iconColor="@color/white"
         />
 
@@ -29,7 +29,7 @@
         android:id="@+id/profile"
         android:icon="@drawable/bottom_btn4"
         android:title="Profile"
-        app:cnb_backgroundColor="@color/darkGreen"
+        app:cnb_backgroundColor="@color/black"
         app:cnb_iconColor="@color/white"
         />
 </menu>

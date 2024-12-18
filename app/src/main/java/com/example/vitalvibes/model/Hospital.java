@@ -2,44 +2,54 @@ package com.example.vitalvibes.model;
 
 import com.google.android.gms.maps.model.LatLng; // for Google Maps LatLng
 
+import java.util.ArrayList;
+
 public class Hospital {
     private String hospitalId;
+    private String name;
     private String address;
     private String hospitalBio;
-    private String picture; // Image URL or Base64 string
     private String nearest; // Nearest landmark
     private String mobile;
     private String site; // Website
-    private LatLng location; // Latitude and Longitude for Google Maps
-    private Double rating = 0.0; // Rating of the hospital
+    //private LatLng location; // Latitude and Longitude for Google Maps
+    private Double rating; // Rating of the hospital
     private String date; // Date (could be timestamp or formatted date)
+    private ArrayList<String> pic;
 
     // Default constructor
     public Hospital() {}
 
     // Constructor with all fields
-    public Hospital(String hospitalId, String address, String hospitalBio, String picture,
-                    String nearest, String mobile, String site, LatLng location,
-                    Double rating, String date) {
+
+
+    public Hospital(String hospitalId, String name, String address, String hospitalBio, String nearest, String mobile, String site, Double rating, String date, ArrayList<String> pic) {
         this.hospitalId = hospitalId;
+        this.name = name;
         this.address = address;
         this.hospitalBio = hospitalBio;
-        this.picture = picture;
         this.nearest = nearest;
         this.mobile = mobile;
         this.site = site;
-        this.location = location;
         this.rating = rating;
         this.date = date;
+        this.pic = pic;
     }
 
-    // Getters and Setters
     public String getHospitalId() {
         return hospitalId;
     }
 
     public void setHospitalId(String hospitalId) {
         this.hospitalId = hospitalId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getAddress() {
@@ -56,14 +66,6 @@ public class Hospital {
 
     public void setHospitalBio(String hospitalBio) {
         this.hospitalBio = hospitalBio;
-    }
-
-    public String getPicture() {
-        return picture;
-    }
-
-    public void setPicture(String picture) {
-        this.picture = picture;
     }
 
     public String getNearest() {
@@ -90,14 +92,6 @@ public class Hospital {
         this.site = site;
     }
 
-    public LatLng getLocation() {
-        return location;
-    }
-
-    public void setLocation(LatLng location) {
-        this.location = location;
-    }
-
     public Double getRating() {
         return rating;
     }
@@ -112,5 +106,13 @@ public class Hospital {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public ArrayList<String> getPic() {
+        return pic;
+    }
+
+    public void setPic(ArrayList<String> pic) {
+        this.pic = pic;
     }
 }
