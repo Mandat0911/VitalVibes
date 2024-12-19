@@ -46,8 +46,9 @@
                         android:layout_height="wrap_content"
                         android:text="How Are you Today?"
                         android:textColor="@color/black"
+                        android:textSize="27sp"
                         android:textStyle="bold"
-                        android:textSize="27sp"/>
+                        android:visibility="visible" />
                 </LinearLayout>
 
                 <ImageView

@@ -2,9 +2,10 @@ package com.example.vitalvibes.model;
 
 import com.google.android.gms.maps.model.LatLng; // for Google Maps LatLng
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Hospital {
+public class Hospital implements Serializable {
     private String hospitalId;
     private String name;
     private String address;
@@ -13,7 +14,7 @@ public class Hospital {
     private String mobile;
     private String site; // Website
     //private LatLng location; // Latitude and Longitude for Google Maps
-    private Double rating; // Rating of the hospital
+    private float rating; // Rating of the hospital
     private String date; // Date (could be timestamp or formatted date)
     private ArrayList<String> pic;
 
@@ -23,7 +24,7 @@ public class Hospital {
     // Constructor with all fields
 
 
-    public Hospital(String hospitalId, String name, String address, String hospitalBio, String nearest, String mobile, String site, Double rating, String date, ArrayList<String> pic) {
+    public Hospital(String hospitalId, String name, String address, String hospitalBio, String nearest, String mobile, String site, Float rating, String date, ArrayList<String> pic) {
         this.hospitalId = hospitalId;
         this.name = name;
         this.address = address;
@@ -92,11 +93,11 @@ public class Hospital {
         this.site = site;
     }
 
-    public Double getRating() {
+    public Float getRating() {
         return rating;
     }
 
-    public void setRating(Double rating) {
+    public void setRating(Float rating) {
         this.rating = rating;
     }
 

@@ -103,18 +103,18 @@ public class HomeActivity extends AppCompatActivity {
     private void displayRoleBasedUI(String role) {
         if ("Admin".equals(role)) {
             // Display Admin features
-//            showAdminFeatures();
+            showAdminFeatures();
         } else {
             // Display Donor features
             initCategory();
         }
     }
 
-//    private void showAdminFeatures() {
-//        // Hide donor-specific UI elements and show admin-specific UI
-//        binding.AdminView.setVisibility(View.VISIBLE);
+    private void showAdminFeatures() {
+        // Hide donor-specific UI elements and show admin-specific UI
+        binding.HomeGreeting.setVisibility(View.GONE);
 //        binding.DonorView.setVisibility(View.GONE);
-//    }
+    }
 //
 //    private void showDonorFeatures() {
 //        // Hide admin-specific UI elements and show donor-specific UI
