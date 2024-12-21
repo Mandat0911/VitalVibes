@@ -6,9 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background"
-    tools:context=".Activities.formUIActivity">
+    tools:context=".Activities.EditProfileActivity">
 
     <ScrollView
+        android:id="@+id/scrollView4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,7 +19,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -39,7 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
-                    android:text="Create\nAccount"
+                    android:text="Update Profile"
                     android:textColor="#ffffff"
                     android:textSize="40sp"
                     android:textStyle="bold"
@@ -145,24 +146,24 @@
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 
-            <ImageView
-                android:id="@+id/SignUpButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="32dp"
-                app:srcCompat="@drawable/btn_login" />
 
-            <TextView
-                android:id="@+id/HaveNoAccount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Are you new donor? Signup"
-                android:textColor="#ffffff"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:layout_marginTop="16dp"
-                />
         </LinearLayout>
     </ScrollView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/SaveBtn"
+        style="@android:style/Widget.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button"
+        android:text="Save"
+        android:textColor="#3545A8"
+        android:textSize="23sp"
+        android:textStyle="bold"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/scrollView4"
+        tools:layout_editor_absoluteX="32dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

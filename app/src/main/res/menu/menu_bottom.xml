@@ -5,6 +5,7 @@
         android:id="@+id/home"
         android:icon="@drawable/bottom_btn1"
         android:title="Home"
+
         app:cnb_backgroundColor="@color/black"
         app:cnb_iconColor="@color/white"
         />

@@ -1,5 +1,7 @@
 package com.example.vitalvibes.Activities;
 
+import static com.example.vitalvibes.Utils.Utils.isValidDob;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -75,14 +77,17 @@ public class SignupActivity extends AppCompatActivity {
                             // Hash the password (optional, you can store password as is)
                             String hashedPassword = hashPassword(password);
 
-                            // Parse Date of Birth
-                            Date dateOfBirth = parseDate(dob) ;
-                            Log.d("Date", dateOfBirth.toString());
+                            // Validate Date of Birth
+                            if (!isValidDob(dob)) {
+                                Toast.makeText(this, "Invalid Date of Birth. Valid format is dd/mm/yyyy", Toast.LENGTH_SHORT).show();
+                                return; // Early return if DOB is invalid
+                            }
+
                             // Default role is "Donor"
                             String role = "Donor";
 
                             // Create Donor object
-                            Donor donor = new Donor(userId, name, email, dateOfBirth, phoneNumber, hashedPassword, role);
+                            Donor donor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, role);
 
                             // Save the Donor object in Firebase Realtime Database
                             databaseReference.child(userId).setValue(donor)
@@ -114,7 +119,7 @@ public class SignupActivity extends AppCompatActivity {
             binding.signUpEmailInput.setError("Invalid email format");
             return false;
         }
-        if (dob.isEmpty() || parseDate(dob) == null) {
+        if (dob.isEmpty()) {
             binding.signUpDOBInput.setError("Invalid date format (use dd-MM-yyyy)");
             return false;
         }
@@ -146,21 +151,6 @@ public class SignupActivity extends AppCompatActivity {
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private Date parseDate(String dob) {
-        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // the initial pattern
-        SimpleDateFormat formatter = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()); // the desired output pattern
-        try {
-            // Parse the input date string to a Date object
-            Date parsedDate = parser.parse(dob);
-            // Format the parsed Date into the desired pattern and parse it back to a Date
-            String formattedDate = formatter.format(parsedDate);
-            return formatter.parse(formattedDate);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 

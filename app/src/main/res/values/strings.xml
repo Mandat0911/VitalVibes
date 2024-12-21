@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">VitalVibes</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="my_app_api">AIzaSyDX2N1ubvBCSfc46A-5DWfUs0vIfddDOW8</string>
 </resources>

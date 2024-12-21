@@ -44,6 +44,8 @@ dependencies {
     implementation ("com.github.ismaeldivita:chip-navigation-bar:1.4.0")
     implementation("androidx.viewpager2:viewpager2:1.1.0")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
     implementation(libs.play.services.maps)

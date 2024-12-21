@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".Activities.HospitalDetail">
 
     <ScrollView
@@ -31,7 +32,7 @@
                     android:layout_height="match_parent">
 
                     <ImageView
-                        android:id="@+id/imageView5"
+                        android:id="@+id/mainPic"
                         android:layout_width="wrap_content"
                         android:layout_height="400dp"
                         android:scaleType="centerCrop"
@@ -69,7 +70,7 @@
                         android:id="@+id/imageView10"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
+                        app:layout_constraintBottom_toBottomOf="@+id/mainPic"
                         app:srcCompat="@drawable/gradient_white_bg" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -335,9 +336,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:text="000"
-            android:textStyle="bold"
-            android:textSize="16sp"
             android:textColor="@color/darkGreen"
+            android:textSize="16sp"
+            android:textStyle="bold"
 
             app:layout_constraintBottom_toBottomOf="@+id/ShowMapDetailBtn"
             app:layout_constraintStart_toStartOf="parent"

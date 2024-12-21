@@ -1,17 +1,21 @@
 package com.example.vitalvibes.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+//import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import com.example.vitalvibes.Adapter.HosptalListAdapter;
+import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityHomeBinding;
 import com.example.vitalvibes.model.Donor;
 import com.example.vitalvibes.model.Hospital;
@@ -21,14 +25,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private ChipNavigationBar chipNavigationBar;
     private DatabaseReference databaseReference;
-    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private String userRole;
     private ActivityHomeBinding binding;
+    private SearchView searchView;
+    private HosptalListAdapter adapter; // Adapter for RecyclerView
+    private ArrayList<Hospital> hospitalsList = new ArrayList<>(); // List of hospitals
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +49,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // Initialize Firebase Database
-
         databaseReference = firebaseDatabase.getReference("Donors");
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
         // Fetch user role from the database
         databaseReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -59,15 +70,91 @@ public class HomeActivity extends AppCompatActivity {
                 Toast.makeText(HomeActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Initialize ChipNavigationBar
+        chipNavigationBar = findViewById(R.id.chipNavigationBar);
+        setUpChipNavigationBar();
+        recyclerView = findViewById(R.id.homeMainView);  // Your RecyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Initialize the SearchView
+        searchView = findViewById(R.id.search_bar);
+        searchView.clearFocus();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false; // No action when submitting the query
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // Filter the hospital list based on the query text
+                adapter.filter(newText);
+                return false;
+            }
+        });
+        fetchHospitalData();
+    }
+
+    private void fetchHospitalData() {
+        DatabaseReference myCategory = firebaseDatabase.getReference("Popular");
+        myCategory.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot issue : snapshot.getChildren()) {
+                        Hospital hospital = issue.getValue(Hospital.class);
+                        if (hospital != null) {
+                            hospitalsList.add(hospital);
+                        }
+                    }
+                    adapter = new HosptalListAdapter(hospitalsList);  // Set the adapter
+                    recyclerView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(HomeActivity.this, "Error fetching data", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void navigateToActivity(Class<?> targetActivity) {
+        startActivity(new Intent(HomeActivity.this, targetActivity));
+    }
+
+    private void setUpChipNavigationBar() {
+        chipNavigationBar.setMenuResource(R.menu.menu_bottom);
+
+        // Set the default selected item and attach a listener
+        chipNavigationBar.setItemSelected(R.id.home, true);
+
+        chipNavigationBar.setOnItemSelectedListener(id -> {
+            Class<?> targetActivity = null;
+
+            // Determine target activity based on the selected menu item
+            if (id == R.id.home) {
+                targetActivity = HomeActivity.class;
+            } else if (id == R.id.createSite) {
+                targetActivity = CreateSiteActivity.class;
+            } else if (id == R.id.location) {
+                targetActivity = LocationActivity.class;
+            } else if (id == R.id.profile) {
+                targetActivity = ProfileActivity.class;
+            }
+
+            // Only navigate if the selected activity is different from the current one
+            if (targetActivity != null && !targetActivity.equals(this.getClass())) {
+                navigateToActivity(targetActivity);
+            }
+        });
     }
 
     private void initCategory() {
         DatabaseReference myCategory = firebaseDatabase.getReference("Popular");
         binding.progressBarCategory.setVisibility(View.VISIBLE);
-        ArrayList<Hospital> list = new ArrayList<>();
-
-        // Set up RecyclerView LayoutManager
-        binding.homeMainView.setLayoutManager(new GridLayoutManager(HomeActivity.this, 4));
+        hospitalsList.clear(); // Clear the list before adding new data
 
         myCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -76,11 +163,12 @@ public class HomeActivity extends AppCompatActivity {
                     for (DataSnapshot issue : snapshot.getChildren()) {
                         Hospital hospital = issue.getValue(Hospital.class);
                         if (hospital != null) {
-                            list.add(hospital);
+                            hospitalsList.add(hospital); // Add hospital to list
                         }
                     }
-                    if (!list.isEmpty()) {
-                        RecyclerView.Adapter adapter = new HosptalListAdapter(list);
+                    if (!hospitalsList.isEmpty()) {
+                        // Create the adapter and set it to the RecyclerView
+                        adapter = new HosptalListAdapter(hospitalsList);
                         binding.homeMainView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
                         binding.homeMainView.setAdapter(adapter);
                     } else {
@@ -99,7 +187,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-
     private void displayRoleBasedUI(String role) {
         if ("Admin".equals(role)) {
             // Display Admin features
@@ -115,10 +202,4 @@ public class HomeActivity extends AppCompatActivity {
         binding.HomeGreeting.setVisibility(View.GONE);
 //        binding.DonorView.setVisibility(View.GONE);
     }
-//
-//    private void showDonorFeatures() {
-//        // Hide admin-specific UI elements and show donor-specific UI
-//        binding.AdminView.setVisibility(View.GONE);
-//        binding.DonorView.setVisibility(View.VISIBLE);
-//    }
 }

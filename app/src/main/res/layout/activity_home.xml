@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".Activities.HomeActivity">
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -59,7 +58,7 @@
 
             </LinearLayout>
 
-            <EditText
+            <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_bar"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
@@ -67,16 +66,13 @@
                 android:layout_marginTop="8dp"
                 android:padding="12dp"
                 android:textSize="16sp"
-                android:layout_weight="1"
-                android:drawableEnd="@drawable/search_icon"
-                android:textStyle="italic"
-                android:ems="10"
                 android:textColor="@color/black"
                 android:textColorHint="@color/grey"
                 android:inputType="text"
-                android:hint="Blood Donation location"
-                android:background="@drawable/search_bg"/>
-
+                app:queryHint="Blood Donation location"
+                android:background="@drawable/search_bg"
+                app:iconifiedByDefault="false"
+                android:drawableEnd="@drawable/search_icon" />
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -141,21 +137,22 @@
         </LinearLayout>
     </ScrollView>
 
-   <com.ismaeldivita.chipnavigation.ChipNavigationBar
+    <com.ismaeldivita.chipnavigation.ChipNavigationBar
+        android:id="@+id/chipNavigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cnb_menuResource="@menu/menu_bottom"
         android:background="@color/white"
         android:elevation="3dp"
         android:padding="8dp"
-        app:cnb_iconSize="20sp"
         app:cnb_iconColor="@color/black"
+        app:cnb_iconSize="20sp"
+        app:cnb_menuResource="@menu/menu_bottom"
         app:cnb_orientationMode="horizontal"
         app:cnb_radius="50dp"
         app:cnb_unselectedColor="@color/darkGreen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
