@@ -43,7 +43,7 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
         binding.nameHospital.setText(hospital.getName());
         binding.address.setText(hospital.getAddress());
         binding.rating.setText(String.valueOf(hospital.getRating()));
-        binding.distance.setText(hospital.getNearest());
+        binding.distance.setText(hospital.getlocation());
 
         Glide.with(context)
                 .load(hospital.getPic().get(0)) // Load the first picture

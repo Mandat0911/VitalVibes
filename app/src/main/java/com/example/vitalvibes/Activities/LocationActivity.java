@@ -6,7 +6,10 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -59,15 +62,75 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);  // Initialize the map
         }
+        String location = getIntent().getStringExtra("address");
+        if (location != null && !location.isEmpty()) {
+            // Call searchMap directly with the address
+            binding.mapSearch.setQuery(location, false);
+            searchMapFromHospital(location);
+        }
+
+        // Set up listener for the button to open Google Maps
+        binding.btnOpenGoogleMaps.setOnClickListener(v -> openInGoogleMaps());
 
         // Get last location
         getLastLocation();
         searchMap();
     }
 
+    private void openInGoogleMaps() {
+        String location = binding.mapSearch.getQuery().toString();
+
+        if (location != null && !location.isEmpty()) {
+            // Create an Intent to open Google Maps
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + location);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+
+            // Check if Google Maps is installed and start the activity
+            if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(mapIntent);
+            } else {
+                // If Google Maps is not installed, show a message
+                Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Please enter a valid location", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void searchMapFromHospital(String location) {
+        AtomicReference<List<Address>> addressList = new AtomicReference<>();
+
+        if (location != null && !location.isEmpty()) {
+            Geocoder geocoder = new Geocoder(LocationActivity.this);
+
+            new Thread(() -> {
+                try {
+                    addressList.set(geocoder.getFromLocationName(location, 1));
+                    if (addressList.get() != null && !addressList.get().isEmpty()) {
+                        Address address = addressList.get().get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                        runOnUiThread(() -> {
+                            MarkerOptions options = new MarkerOptions().position(latLng).title(location);
+                            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                            map.addMarker(options);
+                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+
+                        });
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    runOnUiThread(() -> {
+                        Toast.makeText(LocationActivity.this, "Failed to get location", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }).start();
+        }
+    }
+
     private void searchMap() {
         binding.mapSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-
             @Override
             public boolean onQueryTextSubmit(String query) {
                 String location = binding.mapSearch.getQuery().toString();
@@ -169,11 +232,21 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         // Add a marker at current location if available
         if (currentLocation != null) {
             LatLng myPosition = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLng(myPosition));
-            MarkerOptions options = new MarkerOptions().position(myPosition).title("My Location");
-            options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 15)); // Set zoom level
+
+            MarkerOptions options = new MarkerOptions()
+                    .position(myPosition)
+                    .title("My Location")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             map.addMarker(options);
         }
+
+        // Enable UI settings
+        map.getUiSettings().setZoomControlsEnabled(true); // Show zoom buttons
+        map.getUiSettings().setCompassEnabled(true); // Enable compass
+        map.getUiSettings().setZoomGesturesEnabled(true); // Enable pinch-to-zoom gestures
+        map.setPadding(50, 100, 50, 200); // Left, Top, Right, Bottom padding
+
     }
 
     @Override
@@ -187,5 +260,35 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
                 // Optionally, redirect to settings if permission is permanently denied
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.map_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.mapNormal){
+            map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        }
+
+        if (id == R.id.mapSatellite){
+            map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        }
+
+        if (id == R.id.mapHybrid){
+            map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        }
+
+        if (id == R.id.mapTerrain){
+            map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
