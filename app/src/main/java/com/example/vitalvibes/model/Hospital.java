@@ -5,16 +5,11 @@ import java.util.ArrayList;
 
 public class Hospital implements Serializable {
     private String hospitalId;
-    private String name;
+    private String SiteName;
     private String address;
     private String hospitalBio;
-    private String location; // location landmark
     private String mobile;
-    private String site; // Website
-    private float rating; // Rating of the hospital
-    private String date; // Date (could be timestamp or formatted date)
     private ArrayList<String> pic;
-
     private String startDate;
     private String endDate;
 
@@ -23,20 +18,15 @@ public class Hospital implements Serializable {
 
     // Constructor with all fields
 
-    public Hospital(String hospitalId, String name, String address, String hospitalBio, String location, String mobile, String site, Float rating, String date, ArrayList<String> pic, String startDate, String endDate) {
+    public Hospital(String hospitalId, String siteName, String address, String hospitalBio, String mobile, ArrayList<String> pic, String startDate, String endDate) {
         this.hospitalId = hospitalId;
-        this.name = name;
+        SiteName = siteName;
         this.address = address;
         this.hospitalBio = hospitalBio;
-        this.location = location;
         this.mobile = mobile;
-        this.site = site;
-        this.rating = rating;
-        this.date = date;
         this.pic = pic;
         this.startDate = startDate;
         this.endDate = endDate;
-
     }
 
     public String getHospitalId() {
@@ -47,12 +37,12 @@ public class Hospital implements Serializable {
         this.hospitalId = hospitalId;
     }
 
-    public String getName() {
-        return name;
+    public String getSiteName() {
+        return SiteName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSiteName(String siteName) {
+        SiteName = siteName;
     }
 
     public String getAddress() {
@@ -71,44 +61,12 @@ public class Hospital implements Serializable {
         this.hospitalBio = hospitalBio;
     }
 
-    public String getlocation() {
-        return location;
-    }
-
-    public void setlocation(String location) {
-        this.location = location;
-    }
-
     public String getMobile() {
         return mobile;
     }
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
-    }
-
-    public String getSite() {
-        return site;
-    }
-
-    public void setSite(String site) {
-        this.site = site;
-    }
-
-    public Float getRating() {
-        return rating;
-    }
-
-    public void setRating(Float rating) {
-        this.rating = rating;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public ArrayList<String> getPic() {

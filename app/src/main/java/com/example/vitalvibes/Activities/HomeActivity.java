@@ -97,7 +97,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void fetchHospitalData() {
-        DatabaseReference myCategory = firebaseDatabase.getReference("Popular");
+        DatabaseReference myCategory = firebaseDatabase.getReference("Hospital");
         myCategory.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.vitalvibes.Activities.HospitalDetail;
+import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ViewholderNearbyHospitalBinding;
 import com.example.vitalvibes.model.Hospital;
 
@@ -37,21 +38,28 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HosptalListAdapter.Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         Hospital hospital = hospitalsListFiltered.get(position); // Get the filtered list of hospitals
 
-        binding.nameHospital.setText(hospital.getName());
+        binding.nameHospital.setText(hospital.getSiteName());
         binding.address.setText(hospital.getAddress());
-        binding.rating.setText(String.valueOf(hospital.getRating()));
-        binding.distance.setText(hospital.getlocation());
+        binding.distance.setText(hospital.getAddress());  // Modify as per distance logic if needed
 
-        Glide.with(context)
-                .load(hospital.getPic().get(0)) // Load the first picture
-                .into(binding.pic);
+        // Check if hospital has images and load the first one using Glide
+        if (hospital.getPic() != null && !hospital.getPic().isEmpty()) {
+            Glide.with(context)
+                    .load(hospital.getPic().get(0)) // Load the first picture if available
+                    .into(binding.pic);
+        } else {
+            // Handle case where no picture is available (optional)
+            Glide.with(context)
+                    .load(R.drawable.ic_launcher_background) // Set a default image if no picture is available
+                    .into(binding.pic);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, HospitalDetail.class);
-            intent.putExtra("object", hospitalsListFiltered.get(position)); // Single object
+            intent.putExtra("object", hospitalsListFiltered.get(position)); // Pass hospital object to detail screen
             context.startActivity(intent);
         });
     }
@@ -69,8 +77,9 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
         } else {
             query = query.toLowerCase();
             for (Hospital hospital : hospitalsList) {
-                if (hospital.getName().toLowerCase().contains(query) ||
-                        hospital.getName().toLowerCase().contains(query)) {
+                // Match query with hospital name and address
+                if (hospital.getSiteName().toLowerCase().contains(query) ||
+                        hospital.getAddress().toLowerCase().contains(query)) {
                     hospitalsListFiltered.add(hospital); // Add matching hospitals
                 }
             }

@@ -4,19 +4,10 @@ import static com.example.vitalvibes.Utils.Utils.isValidDob;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.example.vitalvibes.R;
-import com.example.vitalvibes.databinding.ActivityLoginBinding;
-import com.example.vitalvibes.databinding.ActivityMainBinding;
 import com.example.vitalvibes.databinding.ActivitySignupBinding;
 import com.example.vitalvibes.model.Donor;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,10 +18,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import java.util.Objects;
 
 public class SignupActivity extends AppCompatActivity {
@@ -71,6 +58,8 @@ public class SignupActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Firebase Authentication successful, create user in Firebase Database
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
+
+                            assert firebaseUser != null;
                             firebaseUser.sendEmailVerification();
                             String userId = firebaseUser.getUid();  // Get Firebase UID
 

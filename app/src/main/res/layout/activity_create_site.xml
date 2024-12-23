@@ -20,6 +20,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="false"
+                android:max="100"
+                android:progress="0"
+                android:visibility="gone" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -56,110 +65,187 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-<!--            <EditText-->
-<!--                android:id="@+id/siteName"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="32dp"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginEnd="32dp"-->
-<!--                android:background="@drawable/edittext_background"-->
-<!--                android:drawableStart="@drawable/email"-->
-<!--                android:drawablePadding="16dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Site Name"-->
-<!--                android:inputType="textPersonName"-->
-<!--                android:padding="8dp"-->
-<!--                android:textColorHint="#ffffff" />-->
+            <EditText
+                android:id="@+id/SiteName"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@drawable/website"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="Site Name"
+                android:inputType="textPersonName"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
 
-<!--            <EditText-->
-<!--                android:id="@+id/addressSite"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="32dp"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginEnd="32dp"-->
-<!--                android:background="@drawable/edittext_background"-->
-<!--                android:drawableStart="@drawable/email"-->
-<!--                android:drawablePadding="16dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Address"-->
-<!--                android:inputType="textPersonName"-->
-<!--                android:padding="8dp"-->
-<!--                android:textColorHint="#ffffff" />-->
+            <EditText
+                android:id="@+id/SiteAddress"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@drawable/location"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="Address"
+                android:inputType="textPersonName"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
 
-<!--            <EditText-->
-<!--                android:id="@+id/signUpDOBInput"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="32dp"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginEnd="32dp"-->
-<!--                android:background="@drawable/edittext_background"-->
-<!--                android:drawableStart="@drawable/email"-->
-<!--                android:drawablePadding="16dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Date of birth (dd/mm/yyyy)"-->
-<!--                android:inputType="datetime"-->
-<!--                android:padding="8dp"-->
-<!--                android:textColorHint="#ffffff" />-->
+            <EditText
+                android:id="@+id/SiteStartDay"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@drawable/calendar"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="Start day (dd/mm/yyyy)"
+                android:inputType="datetime"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
 
-<!--            <EditText-->
-<!--                android:id="@+id/signUpMobileInput"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="32dp"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginEnd="32dp"-->
-<!--                android:background="@drawable/edittext_background"-->
-<!--                android:drawableStart="@drawable/email"-->
-<!--                android:drawablePadding="16dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Enter your phone"-->
-<!--                android:inputType="number"-->
-<!--                android:padding="8dp"-->
-<!--                android:textColorHint="#ffffff" />-->
+            <EditText
+                android:id="@+id/SiteEndDay"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@drawable/calendar"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="End day (dd/mm/yyyy)"
+                android:inputType="datetime"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
 
-
-<!--            <com.google.android.material.textfield.TextInputEditText-->
-<!--                android:id="@+id/signUpPasswordInput"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="32dp"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginEnd="32dp"-->
-<!--                android:background="@drawable/edittext_background"-->
-<!--                android:drawableStart="@drawable/password"-->
-<!--                android:drawablePadding="16dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Site Description"-->
-<!--                android:inputType="textLongMessage"-->
-<!--                android:padding="8dp"-->
-<!--                android:textColorHint="#ffffff" />-->
-
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="288dp"
-                android:layout_height="265dp"
+            <EditText
+                android:id="@+id/SitePhone"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@android:drawable/ic_menu_call"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="Enter your phone"
+                android:inputType="number"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
 
 
-                android:src="@mipmap/ic_launcher" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/SiteDescription"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="@android:drawable/ic_menu_edit"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="Site Description"
+                android:inputType="textLongMessage"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
 
-<!--            <com.google.android.material.textfield.TextInputEditText-->
-<!--                android:id="@+id/signUpConfirmPasswordInput"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="50dp"-->
-<!--                android:layout_marginStart="32dp"-->
-<!--                android:layout_marginTop="20dp"-->
-<!--                android:layout_marginEnd="32dp"-->
-<!--                android:background="@drawable/edittext_background"-->
-<!--                android:drawableStart="@drawable/password"-->
-<!--                android:drawablePadding="16dp"-->
-<!--                android:ems="10"-->
-<!--                android:hint="Upload Image"-->
-<!--                android:inputType="textPassword"-->
-<!--                android:padding="8dp"-->
-<!--                android:textColorHint="#ffffff" />-->
+            <TextView
+                android:id="@+id/UploadImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:hint="Upload Image"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_marginHorizontal="24dp"
+                android:background="@drawable/createsite_bg"
+                android:orientation="horizontal">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.333">
+
+
+                    <ImageView
+                        android:id="@+id/image1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@android:drawable/ic_input_add" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/view2"
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@color/darkGreen" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.333">
+
+                    <ImageView
+                        android:id="@+id/image2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@android:drawable/ic_input_add" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="1dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:background="@color/darkGreen" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.333">
+
+                    <ImageView
+                        android:id="@+id/image3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@android:drawable/ic_input_add" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/CreateSiteBtn"
@@ -169,6 +255,8 @@
                 android:layout_marginTop="32dp"
                 app:srcCompat="@drawable/btn_login" />
 
+
         </LinearLayout>
+
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

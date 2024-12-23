@@ -47,16 +47,13 @@ public class HospitalDetail extends AppCompatActivity {
     }
 
     private void setVariable(){
-        binding.TitleDetail.setText(object.getName());
+        binding.TitleDetail.setText(object.getSiteName());
         binding.phoneDetail.setText(object.getMobile());
         binding.descriptionDetail.setText(object.getHospitalBio());
         binding.AddressDetail.setText(object.getAddress());
         binding.backBtnDetail.setOnClickListener(v -> finish());
-        binding.siteDetail.setText(object.getSite());
-        binding.distanceDetail.setText(object.getlocation());
-        binding.ratingNumDetail.setText(object.getRating()+" Rating");
-        binding.ratingBarDetail.setRating( object.getRating());
-        binding.durationDetail.setText(object.getDate());
+
+        binding.distanceDetail.setText(object.getAddress());
     }
 
     private void initList() {

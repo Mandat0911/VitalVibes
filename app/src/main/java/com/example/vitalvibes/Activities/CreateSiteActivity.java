@@ -4,129 +4,122 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import android.Manifest;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
-import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityCreateSiteBinding;
-import com.example.vitalvibes.databinding.ActivityHomeBinding;
-import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-import com.squareup.picasso.Picasso;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CreateSiteActivity extends AppCompatActivity {
+    private static final String CLOUD_API_KEY = "541771626282227";
+    private static final String CLOUD_NAME = "dcc6xt2mw";
+    private static final String CLOUD_API_SECRET = "4RAEy_XPHb8bvQGlu5HJ4bCOuwg";
+    private static final String TAG = "Upload";
+    private static final int IMAGE_REQ = 1;
+    private static int selectedImageSlot = 0;  // Track which image slot is selected (1, 2, or 3)
 
-    private final static String TAG = "Upload";
-    private static int IMAGE_REQ = 1;
-    private Uri imagePath;
+    private final ArrayList<Uri> imagePath = new ArrayList<>();
+    private DatabaseReference databaseReference;
+
+    private FirebaseAuth mAuth;  // FirebaseAuth instance
+
     private ActivityCreateSiteBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         binding = ActivityCreateSiteBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // Initialize FirebaseAuth
+        mAuth = FirebaseAuth.getInstance();
+        // Initialize Firebase Database
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("Hospital");
+
         initConfig();
-
-
-    setListener();
-    getImage();
-
+        setListener();
+        setupImageClickListeners();
     }
 
-    private void getImage() {
-        binding.imageView5.setOnClickListener(v -> {
-            requestPermissions();
-        });
-        binding.CreateSiteBtn.setOnClickListener(v -> {
-            if (imagePath == null) {
-                Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            MediaManager.get().upload(imagePath).callback(new UploadCallback() {
-                @Override
-                public void onStart(String requestId) {
-                    Log.d(TAG, "onStart: "+"Started");
-                }
+    private void createSite() {
+        String siteName = binding.SiteName.getText().toString().trim();
+        String address = binding.SiteAddress.getText().toString().trim();
+        String startDay = binding.SiteStartDay.getText().toString().trim();
+        String phoneNumber = binding.SitePhone.getText().toString().trim();
+        String endDay = binding.SiteEndDay.getText().toString().trim();
+        String bio = binding.SiteDescription.getText().toString().trim();
 
-                @Override
-                public void onProgress(String requestId, long bytes, long totalBytes) {
-                    Log.d(TAG, "onStart: "+"Uploading");
-                }
+        // Get the current user's UID (owner)
+        String ownerUID = mAuth.getCurrentUser().getUid();
 
-                @Override
-                public void onSuccess(String requestId, Map resultData) {
-                    String imageUrl = (String) resultData.get("secure_url");
-                    Log.d(TAG, "Upload successful: " + imageUrl);
 
-                }
+        if (siteName.isEmpty() || address.isEmpty() || startDay.isEmpty() || phoneNumber.isEmpty() || bio.isEmpty()) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-                @Override
-                public void onError(String requestId, ErrorInfo error) {
-                    Log.d(TAG, "onStart: "+error);
-                }
-
-                @Override
-                public void onReschedule(String requestId, ErrorInfo error) {
-                    Log.d(TAG, "onStart: "+error);
-                }
-            }).dispatch();
-        });
-
+        uploadImages(siteName, address, startDay, phoneNumber, endDay, bio, ownerUID);
     }
 
     private void initConfig() {
-        Map config = new HashMap();
-        config.put("cloud_name", "dcc6xt2mw");
-        config.put("api_key","541771626282227");
-        config.put("api_secret","4RAEy_XPHb8bvQGlu5HJ4bCOuwg");
-        config.put("secure", true);
+        Map<String, String> config = new HashMap<>();
+        config.put("cloud_name", CLOUD_NAME);
+        config.put("api_key", CLOUD_API_KEY);
+        config.put("api_secret", CLOUD_API_SECRET);
+        config.put("secure", "true");
         MediaManager.init(this, config);
     }
 
-
-
-    private void requestPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13+
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
-                    == PackageManager.PERMISSION_GRANTED) {
-                selectImage();
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.READ_MEDIA_IMAGES
-                }, IMAGE_REQ);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                selectImage();
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                }, IMAGE_REQ);
-            }
-        }
+    private void setListener() {
+        binding.backBtnCreateSite.setOnClickListener(v -> finish());
+        binding.CreateSiteBtn.setOnClickListener(v -> createSite());
     }
 
+    private void setupImageClickListeners() {
+        binding.image1.setOnClickListener(v -> {
+            selectedImageSlot = 1;
+            requestPermissions();
+        });
+        binding.image2.setOnClickListener(v -> {
+            selectedImageSlot = 2;
+            requestPermissions();
+        });
+        binding.image3.setOnClickListener(v -> {
+            selectedImageSlot = 3;
+            requestPermissions();
+        });
+    }
+
+    private void requestPermissions() {
+        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                ? android.Manifest.permission.READ_MEDIA_IMAGES
+                : android.Manifest.permission.READ_EXTERNAL_STORAGE;
+
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            selectImage();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, IMAGE_REQ);
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -134,46 +127,123 @@ public class CreateSiteActivity extends AppCompatActivity {
 
         if (requestCode == IMAGE_REQ) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted
                 selectImage();
             } else {
-                // Permission denied
                 Toast.makeText(this, "Permission denied to access images", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-
     private void selectImage() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true); // Allow multiple selection
         startActivityForResult(intent, IMAGE_REQ);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == IMAGE_REQ && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-            imagePath = data.getData();
-            try {
-                Picasso.get().load(imagePath).into(binding.imageView5);
-            } catch (Exception e) {
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
+        if (requestCode == IMAGE_REQ && resultCode == Activity.RESULT_OK) {
+            if (data != null) {
+                if (data.getClipData() != null) { // Multiple images selected
+                    Uri imageUri = data.getClipData().getItemAt(0).getUri(); // Pick the first image for simplicity
+                    imagePath.add(imageUri); // Add the image to the list
+                    displaySelectedImage(imageUri);
+                } else if (data.getData() != null) { // Single image selected
+                    Uri imageUri = data.getData();
+                    imagePath.add(imageUri); // Add the image to the list
+                    displaySelectedImage(imageUri);
+                }
             }
-        } else {
-            Toast.makeText(this, "No image selected", Toast.LENGTH_SHORT).show();
         }
     }
 
+    private void displaySelectedImage(Uri imageUri) {
+        // Display image in corresponding slot based on selectedImageSlot
+        switch (selectedImageSlot) {
+            case 1:
+                binding.image1.setImageURI(imageUri);
+                break;
+            case 2:
+                binding.image2.setImageURI(imageUri);
+                break;
+            case 3:
+                binding.image3.setImageURI(imageUri);
+                break;
+        }
+    }
 
-    private void setListener() {
-        binding.backBtnCreateSite.setOnClickListener(v -> finish());
+    private void uploadImages(String siteName, String address, String startDay, String phoneNumber, String endDay, String bio, String ownerUID) {
+        if (imagePath.isEmpty()) {
+            Toast.makeText(this, "Please select at least one image", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ArrayList<String> imageUrls = new ArrayList<>();
+        for (Uri imageUri : imagePath) {
+            MediaManager.get().upload(imageUri).callback(new UploadCallback() {
+                @Override
+                public void onStart(String requestId) {
+                    Log.d(TAG, "onStart: Upload started for " + requestId);
+                }
+
+                @Override
+                public void onProgress(String requestId, long bytes, long totalBytes) {
+                    Log.d(TAG, "onProgress: Uploading " + requestId);
+                }
+
+                @Override
+                public void onSuccess(String requestId, Map resultData) {
+                    String imageUrl = (String) resultData.get("secure_url");
+                    imageUrls.add(imageUrl); // Add the uploaded image URL to the list
+                    if (imageUrls.size() == imagePath.size()) {
+                        saveSiteData(siteName, address, startDay, phoneNumber, endDay, bio, imageUrls, ownerUID);
+                    }
+                }
+
+                @Override
+                public void onError(String requestId, ErrorInfo error) {
+                    Log.d(TAG, "onError: Upload failed for " + requestId + " with error: " + error.getDescription());
+                }
+
+                @Override
+                public void onReschedule(String requestId, ErrorInfo error) {
+                    Log.d(TAG, "onReschedule: Upload rescheduled for " + requestId);
+                }
+            }).dispatch();
+        }
     }
-    private void navigateToActivity(Class<?> targetActivity) {
-        startActivity(new Intent(CreateSiteActivity.this, targetActivity));
+
+    private void saveSiteData(String siteName, String address, String startDay, String phoneNumber, String endDay, String bio, ArrayList<String> imageUrls, String ownerUID) {
+        String hospitalId = databaseReference.push().getKey(); // Generate unique hospital ID
+        if (hospitalId != null) {
+            // Create a Map to save the site data
+            Map<String, Object> siteData = new HashMap<>();
+            siteData.put("hospitalId", hospitalId);
+            siteData.put("siteName", siteName);
+            siteData.put("address", address);
+            siteData.put("startDate", startDay);
+            siteData.put("endDate", endDay);
+            siteData.put("bio", bio);
+            siteData.put("phoneNumber", phoneNumber);
+            siteData.put("pic", imageUrls); // Save image URLs
+            siteData.put("ownerUID", ownerUID);  // Store the owner's UID
+
+
+            // Save site data to Firebase Realtime Database
+            databaseReference.child(hospitalId).setValue(siteData)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(CreateSiteActivity.this, "Site created successfully!", Toast.LENGTH_SHORT).show();
+                            finish(); // Close the activity after successful creation
+                        } else {
+                            Toast.makeText(CreateSiteActivity.this, "Failed to create site", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
+
 }
