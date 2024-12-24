@@ -97,7 +97,7 @@
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 
-            <EditText
+            <TextView
                 android:id="@+id/SiteStartDay"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -108,12 +108,13 @@
                 android:drawableStart="@drawable/calendar"
                 android:drawablePadding="16dp"
                 android:ems="10"
+                android:textColor="@color/white"
                 android:hint="Start day (dd/mm/yyyy)"
                 android:inputType="datetime"
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 
-            <EditText
+            <TextView
                 android:id="@+id/SiteEndDay"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
@@ -124,6 +125,7 @@
                 android:drawableStart="@drawable/calendar"
                 android:drawablePadding="16dp"
                 android:ems="10"
+                android:textColor="@color/white"
                 android:hint="End day (dd/mm/yyyy)"
                 android:inputType="datetime"
                 android:padding="8dp"

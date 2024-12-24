@@ -2,9 +2,12 @@ package com.example.vitalvibes.Activities;
 
 import static com.example.vitalvibes.Utils.Utils.isValidDob;
 
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -19,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class SignupActivity extends AppCompatActivity {
@@ -53,6 +57,10 @@ public class SignupActivity extends AppCompatActivity {
             builder.show();
         });
 
+        binding.signUpDOBInput.setOnClickListener(v -> {
+            openDialog();
+        });
+
     }
 
     private void signUp() {
@@ -65,7 +73,7 @@ public class SignupActivity extends AppCompatActivity {
         String confirmPassword = binding.signUpConfirmPasswordInput.getText().toString().trim();
 
         // Validate inputs
-        if (validateInputs(name, email, dob, phoneNumber, password, confirmPassword)) {
+        if (validateInputs(name, email, dob, phoneNumber, password ,confirmPassword,bloodType)) {
             // Check if email exists in Firebase Auth
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
@@ -113,11 +121,36 @@ public class SignupActivity extends AppCompatActivity {
         }
     }
 
+    private void openDialog() {
+        // Get the current date
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH); // Zero-based (0 = January)
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Initialize the DatePickerDialog with the current date as the default
+        @SuppressLint("SetTextI18n")
+        DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            // Format the selected date
+            String formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year);
+            binding.signUpDOBInput.setText(formattedDate);
+        }, currentYear, currentMonth, currentDay);
+
+        dialog.show();
+    }
 
 
-    private boolean validateInputs(String name, String email, String dob, String phoneNumber, String password, String confirmPassword) {
+
+
+
+    private boolean validateInputs(String name, String email, String dob, String phoneNumber, String password, String confirmPassword, String bloodType) {
         if (name.isEmpty()) {
             binding.signUpFullName.setError("Name cannot be empty");
+            return false;
+        }
+
+        if (bloodType.isEmpty()) {
+            binding.signUpBloodType.setError("Blood type cannot be empty");
             return false;
         }
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {

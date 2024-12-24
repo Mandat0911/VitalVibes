@@ -1,12 +1,15 @@
 package com.example.vitalvibes.Activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,10 +28,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CreateSiteActivity extends AppCompatActivity {
+    private Calendar startDate;
     private static final String CLOUD_API_KEY = "541771626282227";
     private static final String CLOUD_NAME = "dcc6xt2mw";
     private static final String CLOUD_API_SECRET = "4RAEy_XPHb8bvQGlu5HJ4bCOuwg";
@@ -93,6 +98,12 @@ public class CreateSiteActivity extends AppCompatActivity {
     private void setListener() {
         binding.backBtnCreateSite.setOnClickListener(v -> finish());
         binding.CreateSiteBtn.setOnClickListener(v -> createSite());
+        binding.SiteStartDay.setOnClickListener(v -> openDialog(binding.SiteStartDay, null));
+        binding.SiteEndDay.setOnClickListener(v -> {
+            // Pass the selected start date to ensure end date is always after start date
+            String startDateString = binding.SiteStartDay.getText().toString();
+            openDialog(binding.SiteEndDay, startDateString);
+        });
     }
 
     private void setupImageClickListeners() {
@@ -237,5 +248,39 @@ public class CreateSiteActivity extends AppCompatActivity {
         }
     }
 
+    private void openDialog(TextView targetView, String minDateString) {
+        // Get the current date
+        Calendar calendar = Calendar.getInstance();
+
+        if (minDateString != null) {
+            // Parse the start date string (e.g., "15/12/2024")
+            String[] dateParts = minDateString.split("/");
+            int day = Integer.parseInt(dateParts[0]);
+            int month = Integer.parseInt(dateParts[1]) - 1; // Month is zero-based
+            int year = Integer.parseInt(dateParts[2]);
+
+            // Set the calendar to the selected start date
+            calendar.set(year, month, day);
+        }
+
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH); // Zero-based (0 = January)
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Initialize the DatePickerDialog
+        @SuppressLint("SetTextI18n")
+        DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            // Format the selected date
+            String formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year);
+            targetView.setText(formattedDate);
+        }, currentYear, currentMonth, currentDay);
+
+        if (minDateString != null) {
+            // Set the minimum date for the "End Day"
+            dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+        }
+
+        dialog.show();
+    }
 
 }

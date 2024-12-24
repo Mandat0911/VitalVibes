@@ -91,17 +91,18 @@
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 
-            <EditText
-                android:id="@+id/signUpDOBInput"
+            <TextView
+                android:id="@+id/updateDOBInput"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_marginStart="32dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginEnd="32dp"
                 android:background="@drawable/edittext_background"
-                android:drawableStart="@drawable/email"
+                android:drawableStart="@drawable/calendar"
                 android:drawablePadding="16dp"
                 android:ems="10"
+                android:textColor="@color/white"
                 android:hint="Date of birth (dd/mm/yyyy)"
                 android:inputType="datetime"
                 android:padding="8dp"

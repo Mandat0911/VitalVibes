@@ -90,7 +90,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Filter the hospital list based on the query text
-                adapter.filter(newText);
+                //adapter.filter(newText);
                 return false;
             }
         });

@@ -1,5 +1,7 @@
 package com.example.vitalvibes.Activities;
 
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -25,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 
 public class EditProfileActivity extends AppCompatActivity {
     private ActivityEditProfileBinding binding;
@@ -56,6 +59,28 @@ public class EditProfileActivity extends AppCompatActivity {
             });
             builder.show();
         });
+
+        binding.updateDOBInput.setOnClickListener(v -> {
+            openDialog();
+        });
+    }
+
+    private void openDialog() {
+        // Get the current date
+        Calendar calendar = Calendar.getInstance();
+        int currentYear = calendar.get(Calendar.YEAR);
+        int currentMonth = calendar.get(Calendar.MONTH); // Zero-based (0 = January)
+        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // Initialize the DatePickerDialog with the current date as the default
+        @SuppressLint("SetTextI18n")
+        DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            // Format the selected date
+            String formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year);
+            binding.updateDOBInput.setText(formattedDate);
+        }, currentYear, currentMonth, currentDay);
+
+        dialog.show();
     }
 
     private void fetchProfileData() {
@@ -68,7 +93,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         // Populate data into fields
                         binding.signUpFullName.setText(donor.getName());
                         binding.signUpEmailInput.setText(donor.getEmail());
-                        binding.signUpDOBInput.setText(donor.getDob());
+                        binding.updateDOBInput.setText(donor.getDob());
                         binding.updateBloodType.setText(donor.getBloodType());
                         binding.signUpMobileInput.setText(donor.getPhoneNumber());
                     }
@@ -90,7 +115,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get user ID from Firebase
         String name = binding.signUpFullName.getText().toString().trim();
         String email = binding.signUpEmailInput.getText().toString().trim();
-        String dob = binding.signUpDOBInput.getText().toString().trim();
+        String dob = binding.updateDOBInput.getText().toString().trim();
         String phoneNumber = binding.signUpMobileInput.getText().toString().trim();
         String bloodType = binding.updateBloodType.getText().toString().trim();
         String password = binding.signUpPasswordInput.getText().toString().trim();
