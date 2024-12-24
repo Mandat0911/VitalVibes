@@ -1,5 +1,6 @@
 package com.example.vitalvibes.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.vitalvibes.Adapter.PicListAdapter;
+import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityHospitalDetailBinding;
 import com.example.vitalvibes.model.Hospital;
 import com.google.firebase.auth.FirebaseAuth;
@@ -73,13 +75,11 @@ public class HospitalDetail extends AppCompatActivity {
         binding.backBtnDetail.setOnClickListener(v -> finish());
 
         binding.distanceDetail.setText(object.getAddress());
+
         // Check if the current user is the owner
         String ownerUID = object.getOwnerUID(); // Get ownerUID from the hospital object
-        System.out.println(ownerUID);
         String currentUserUID = mAuth.getCurrentUser().getUid(); // Get current user UID
-        System.out.println(currentUserUID);
-        String hospitalId = object.getHospitalId(); // Get the hospital ID from the object
-        System.out.println(hospitalId);
+
 
         if (currentUserUID.equals(ownerUID)) {
             // Show the delete button only if the current user is the owner
@@ -94,7 +94,60 @@ public class HospitalDetail extends AppCompatActivity {
             binding.DeleteSiteBtn.setVisibility(View.GONE);
             binding.EditSiteBtn.setVisibility(View.GONE);
             binding.DonorSiteBtn.setVisibility(View.VISIBLE);
+            checkFollowStatus(currentUserUID);
+            binding.DonorSiteBtn.setOnClickListener(v -> toggleFollow(currentUserUID));
+        
         }
+    }
+
+    // Toggle follow/unfollow status
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private void toggleFollow(String currentUserUID) {
+        DatabaseReference donorFollowsRef = FirebaseDatabase.getInstance().getReference("DonorFollows");
+        donorFollowsRef.child(currentUserUID).child(object.getHospitalId()).get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().exists()) {
+                        // Unfollow
+                        donorFollowsRef.child(currentUserUID).child(object.getHospitalId()).removeValue()
+                                .addOnCompleteListener(unfollowTask -> {
+                                    if (unfollowTask.isSuccessful()) {
+                                        binding.DonorSiteBtn.setText("Follow");
+                                        binding.DonorSiteBtn.setBackground(getResources().getDrawable(R.drawable.green_bg_btn));
+                                        Toast.makeText(HospitalDetail.this, "Unfollowed successfully", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(HospitalDetail.this, "Unfollow failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    } else {
+                        // Follow
+                        donorFollowsRef.child(currentUserUID).child(object.getHospitalId()).setValue(true)
+                                .addOnCompleteListener(followTask -> {
+                                    if (followTask.isSuccessful()) {
+                                        binding.DonorSiteBtn.setText("Unfollow");
+                                        binding.DonorSiteBtn.setBackground(getResources().getDrawable(R.drawable.delete_blue_bg_btn));
+                                        Toast.makeText(HospitalDetail.this, "Followed successfully", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(HospitalDetail.this, "Follow failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                });
+    }
+
+    // Check if the user is already following
+    private void checkFollowStatus(String currentUserUID) {
+        DatabaseReference donorFollowsRef = FirebaseDatabase.getInstance().getReference("DonorFollows");
+        donorFollowsRef.child(currentUserUID).child(object.getHospitalId())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().exists()) {
+                        binding.DonorSiteBtn.setText("Unfollow");
+                        binding.DonorSiteBtn.setBackground(getResources().getDrawable(R.drawable.delete_blue_bg_btn));
+                    } else {
+                        binding.DonorSiteBtn.setText("Follow");
+                        binding.DonorSiteBtn.setBackground(getResources().getDrawable(R.drawable.green_bg_btn));
+                    }
+                });
     }
 
     // Method to delete the site

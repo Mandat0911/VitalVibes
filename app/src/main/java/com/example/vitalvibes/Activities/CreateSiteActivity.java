@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CreateSiteActivity extends AppCompatActivity {
-    private Calendar startDate;
     private static final String CLOUD_API_KEY = "541771626282227";
     private static final String CLOUD_NAME = "dcc6xt2mw";
     private static final String CLOUD_API_SECRET = "4RAEy_XPHb8bvQGlu5HJ4bCOuwg";
