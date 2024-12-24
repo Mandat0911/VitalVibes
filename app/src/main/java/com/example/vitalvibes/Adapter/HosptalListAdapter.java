@@ -25,8 +25,13 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
     private ViewholderNearbyHospitalBinding binding;
 
     public HosptalListAdapter(ArrayList<Hospital> hospitalsList) {
-        this.hospitalsList = hospitalsList;
-        this.hospitalsListFiltered = new ArrayList<>(hospitalsList); // Make a copy for filtering
+        if (hospitalsList != null) {
+            this.hospitalsList = hospitalsList;
+            this.hospitalsListFiltered = new ArrayList<>(hospitalsList); // Make a copy for filtering
+        } else {
+            this.hospitalsList = new ArrayList<>();
+            this.hospitalsListFiltered = new ArrayList<>();
+        }
     }
 
     @NonNull
@@ -39,52 +44,81 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
-        Hospital hospital = hospitalsListFiltered.get(position); // Get the filtered list of hospitals
+        if (hospitalsListFiltered != null && !hospitalsListFiltered.isEmpty()) {
+            Hospital hospital = hospitalsListFiltered.get(position); // Get the filtered list of hospitals
 
-        binding.nameHospital.setText(hospital.getSiteName());
-        binding.address.setText(hospital.getAddress());
-        binding.distance.setText(hospital.getAddress());  // Modify as per distance logic if needed
+            binding.nameHospital.setText(hospital.getSiteName());
+            binding.address.setText(hospital.getAddress());
+            binding.HospitalPhoneNumber.setText(hospital.getMobile());  // Modify as per distance logic if needed
+            binding.detailDescription.setText(hospital.getHospitalBio());
 
-        // Check if hospital has images and load the first one using Glide
-        if (hospital.getPic() != null && !hospital.getPic().isEmpty()) {
-            Glide.with(context)
-                    .load(hospital.getPic().get(0)) // Load the first picture if available
-                    .into(binding.pic);
-        } else {
-            // Handle case where no picture is available (optional)
-            Glide.with(context)
-                    .load(R.drawable.ic_launcher_background) // Set a default image if no picture is available
-                    .into(binding.pic);
+            // Check if hospital has images and load the first one using Glide
+            if (hospital.getPic() != null && !hospital.getPic().isEmpty()) {
+                Glide.with(context)
+                        .load(hospital.getPic().get(0)) // Load the first picture if available
+                        .into(binding.pic);
+            } else {
+                // Handle case where no picture is available (optional)
+                Glide.with(context)
+                        .load(R.drawable.ic_launcher_background) // Set a default image if no picture is available
+                        .into(binding.pic);
+            }
+
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, HospitalDetail.class);
+                intent.putExtra("object", hospital); // Pass hospital object to detail screen
+                context.startActivity(intent);
+            });
         }
-
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, HospitalDetail.class);
-            intent.putExtra("object", hospitalsListFiltered.get(position)); // Pass hospital object to detail screen
-            context.startActivity(intent);
-        });
     }
 
     @Override
     public int getItemCount() {
-        return hospitalsListFiltered.size(); // Use filtered list size
+        return hospitalsListFiltered != null ? hospitalsListFiltered.size() : 0; // Safely return filtered list size
     }
 
-    // Filter method to filter hospitals based on the query
     public void filter(String query) {
-        hospitalsListFiltered.clear();
-        if (query.isEmpty()) {
-            hospitalsListFiltered.addAll(hospitalsList); // If query is empty, show all hospitals
-        } else {
-            query = query.toLowerCase();
-            for (Hospital hospital : hospitalsList) {
-                // Match query with hospital name and address
-                if (hospital.getSiteName().toLowerCase().contains(query) ||
-                        hospital.getAddress().toLowerCase().contains(query)) {
-                    hospitalsListFiltered.add(hospital); // Add matching hospitals
+        if (hospitalsList != null && !hospitalsList.isEmpty()) {
+            hospitalsListFiltered.clear();
+
+            if (query.isEmpty()) {
+                // If query is empty, show all hospitals
+                hospitalsListFiltered.addAll(hospitalsList);
+            } else {
+                query = query.toLowerCase();
+
+                for (Hospital hospital : hospitalsList) {
+                    String siteName = hospital.getSiteName();
+                    String address = hospital.getAddress();
+
+                    // Add null checks before applying the filter
+                    boolean matchesSiteName = siteName != null && siteName.toLowerCase().contains(query);
+                    boolean matchesAddress = address != null && address.toLowerCase().contains(query);
+
+                    if (matchesSiteName || matchesAddress) {
+                        hospitalsListFiltered.add(hospital); // Add matching hospitals
+                    }
                 }
             }
+            notifyDataSetChanged(); // Notify adapter about data change
         }
-        notifyDataSetChanged(); // Notify adapter about data change
+    }
+
+    public void removeItem(int position) {
+        // Remove the hospital from the list
+        if (position >= 0 && position < hospitalsListFiltered.size()) {
+            hospitalsListFiltered.remove(position);
+            notifyItemRemoved(position); // Notify adapter about the removed item
+        }
+    }
+    // Method to find the position of the hospital in the list (you can customize this based on your data)
+    private int getHospitalPosition(String hospitalId) {
+        for (int i = 0; i < hospitalsListFiltered.size(); i++) {
+            if (hospitalsListFiltered.get(i).getHospitalId().equals(hospitalId)) {
+                return i;
+            }
+        }
+        return -1; // Return -1 if the hospital was not found
     }
 
     public class Viewholder extends RecyclerView.ViewHolder {
@@ -93,4 +127,3 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
         }
     }
 }
-

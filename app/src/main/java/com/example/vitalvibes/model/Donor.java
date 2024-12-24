@@ -10,18 +10,20 @@ public class Donor {
     private String Dob;
     private String phoneNumber;
     private String password;
+    private String bloodType;
     private String role;
 
     public Donor() {
     }
 
-    public Donor(String userId, String name, String email, String dob, String phoneNumber, String password, String role) {
+    public Donor(String userId, String name, String email, String dob, String phoneNumber, String password, String bloodType, String role) {
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.Dob = dob;
         this.phoneNumber = phoneNumber;
         this.password = password;
+        this.bloodType = bloodType;
         this.role = role;
     }
 
@@ -81,5 +83,13 @@ public class Donor {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getBloodType() {
+        return bloodType;
+    }
+
+    public void setBloodType(String bloodType) {
+        this.bloodType = bloodType;
     }
 }

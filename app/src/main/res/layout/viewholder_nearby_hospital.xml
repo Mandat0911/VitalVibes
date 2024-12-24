@@ -30,6 +30,20 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/detailDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Description"
+        android:textColor="@color/grey"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="0.3"
+        app:layout_constraintStart_toEndOf="@+id/pic"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -40,35 +54,18 @@
         app:layout_constraintStart_toStartOf="@+id/nameHospital" />
 
     <TextView
-        android:id="@+id/distance"
+        android:id="@+id/HospitalPhoneNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="100m"
+        android:layout_marginBottom="64dp"
         android:background="@drawable/light_green_bg"
+        android:drawablePadding="8dp"
+        android:padding="8dp"
+        android:text="100m"
         android:textColor="@color/darkGreen"
         android:textStyle="bold"
-        android:padding="8dp"
-        android:drawablePadding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/rating"
-        app:layout_constraintEnd_toStartOf="@+id/rating"
-        app:layout_constraintTop_toTopOf="@+id/rating"
-        app:srcCompat="@drawable/star" />
-
-    <TextView
-        android:id="@+id/rating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="4"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/distance"
-        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

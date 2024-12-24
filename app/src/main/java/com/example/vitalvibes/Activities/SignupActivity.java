@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.vitalvibes.databinding.ActivitySignupBinding;
 import com.example.vitalvibes.model.Donor;
@@ -40,6 +41,18 @@ public class SignupActivity extends AppCompatActivity {
 
         // Set up the sign-up button
         binding.SignUpButton.setOnClickListener(v -> signUp());
+
+        binding.signUpBloodType.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose Blood Type");
+            String[] bloodTypes = {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"};
+            builder.setItems(bloodTypes, (dialog, which) -> {
+                // Set the selected blood type in the EditText
+                binding.signUpBloodType.setText(bloodTypes[which]);
+            });
+            builder.show();
+        });
+
     }
 
     private void signUp() {
@@ -47,6 +60,7 @@ public class SignupActivity extends AppCompatActivity {
         String email = binding.signUpEmailInput.getText().toString().trim();
         String dob = binding.signUpDOBInput.getText().toString().trim();
         String phoneNumber = binding.signUpMobileInput.getText().toString().trim();
+        String bloodType = binding.signUpBloodType.getText().toString().trim();
         String password = binding.signUpPasswordInput.getText().toString().trim();
         String confirmPassword = binding.signUpConfirmPasswordInput.getText().toString().trim();
 
@@ -76,7 +90,7 @@ public class SignupActivity extends AppCompatActivity {
                             String role = "Donor";
 
                             // Create Donor object
-                            Donor donor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, role);
+                            Donor donor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, bloodType ,role);
 
                             // Save the Donor object in Firebase Realtime Database
                             databaseReference.child(userId).setValue(donor)
@@ -98,6 +112,8 @@ public class SignupActivity extends AppCompatActivity {
                     });
         }
     }
+
+
 
     private boolean validateInputs(String name, String email, String dob, String phoneNumber, String password, String confirmPassword) {
         if (name.isEmpty()) {

@@ -35,6 +35,16 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/top_arc2" />
 
+                <ImageView
+                    android:id="@+id/backBtnDetailEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="48dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/back" />
+
                 <TextView
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
@@ -94,6 +104,24 @@
                 android:ems="10"
                 android:hint="Date of birth (dd/mm/yyyy)"
                 android:inputType="datetime"
+                android:padding="8dp"
+                android:textColorHint="#ffffff" />
+
+            <EditText
+                android:id="@+id/updateBloodType"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/edittext_background"
+                android:drawableStart="?android:attr/textSelectHandle"
+                android:drawablePadding="16dp"
+                android:ems="10"
+                android:focusable="false"
+                android:clickable="true"
+                android:hint="Blood type"
+                android:inputType="none"
                 android:padding="8dp"
                 android:textColorHint="#ffffff" />
 

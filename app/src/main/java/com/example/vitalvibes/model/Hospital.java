@@ -12,21 +12,24 @@ public class Hospital implements Serializable {
     private ArrayList<String> pic;
     private String startDate;
     private String endDate;
+    private String OwnerUID;
+
 
     // Default constructor
     public Hospital() {}
 
     // Constructor with all fields
 
-    public Hospital(String hospitalId, String siteName, String address, String hospitalBio, String mobile, ArrayList<String> pic, String startDate, String endDate) {
+    public Hospital (String hospitalId ,String siteName, String address, String hospitalBio, String mobile, ArrayList<String> pic, String startDate, String endDate, String ownerUID) {
         this.hospitalId = hospitalId;
-        SiteName = siteName;
+        this.SiteName = siteName;
         this.address = address;
         this.hospitalBio = hospitalBio;
         this.mobile = mobile;
         this.pic = pic;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.OwnerUID = ownerUID;
     }
 
     public String getHospitalId() {
@@ -91,5 +94,13 @@ public class Hospital implements Serializable {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getOwnerUID() {
+        return OwnerUID;
+    }
+
+    public void setOwnerUID(String ownerUID) {
+        OwnerUID = ownerUID;
     }
 }

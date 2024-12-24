@@ -1,10 +1,12 @@
 package com.example.vitalvibes.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -42,6 +44,18 @@ public class EditProfileActivity extends AppCompatActivity {
 
         // Save changes when the update button is clicked
         binding.SaveBtn.setOnClickListener(v -> updateProfileData());
+        setUpListener();
+
+        binding.updateBloodType.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose Blood Type");
+            String[] bloodTypes = {"A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"};
+            builder.setItems(bloodTypes, (dialog, which) -> {
+                // Set the selected blood type in the EditText
+                binding.updateBloodType.setText(bloodTypes[which]);
+            });
+            builder.show();
+        });
     }
 
     private void fetchProfileData() {
@@ -55,6 +69,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         binding.signUpFullName.setText(donor.getName());
                         binding.signUpEmailInput.setText(donor.getEmail());
                         binding.signUpDOBInput.setText(donor.getDob());
+                        binding.updateBloodType.setText(donor.getBloodType());
                         binding.signUpMobileInput.setText(donor.getPhoneNumber());
                     }
                 } else {
@@ -77,6 +92,7 @@ public class EditProfileActivity extends AppCompatActivity {
         String email = binding.signUpEmailInput.getText().toString().trim();
         String dob = binding.signUpDOBInput.getText().toString().trim();
         String phoneNumber = binding.signUpMobileInput.getText().toString().trim();
+        String bloodType = binding.updateBloodType.getText().toString().trim();
         String password = binding.signUpPasswordInput.getText().toString().trim();
         String confirmPassword = binding.signUpConfirmPasswordInput.getText().toString().trim();
         String role = "Donor"; // Assume role is fixed, or fetch dynamically if required
@@ -108,7 +124,7 @@ public class EditProfileActivity extends AppCompatActivity {
         }
 
         // Create updated Donor object
-        Donor updatedDonor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, role);
+        Donor updatedDonor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, bloodType, role);
 
         // Reference to the Firebase Database
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
@@ -139,5 +155,18 @@ public class EditProfileActivity extends AppCompatActivity {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void setUpListener() {
+        binding.backBtnDetailEdit.setOnClickListener(v -> navigateToActivity(ProfileActivity.class));
+
+    }
+
+    private void navigateToActivity(Class<?> targetActivity) {
+        Intent intent = new Intent(EditProfileActivity.this, targetActivity);
+        // Add flags to clear the back stack
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+//        finish(); // Ensure the current activity is finished
     }
 }

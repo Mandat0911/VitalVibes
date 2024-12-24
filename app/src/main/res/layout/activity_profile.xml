@@ -47,6 +47,21 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/LogoutBtn"
+                    style="@android:style/Widget.Button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="90dp"
+                    android:background="@drawable/button"
+                    android:padding="16dp"
+                    android:text="Logout"
+                    android:textColor="#3545A8"
+                    android:textSize="23sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -59,25 +74,27 @@
 
                 android:layout_marginEnd="32dp"
                 android:background="@drawable/edittext_background">
+
                 <TextView
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="14sp"
-                    android:text="Name"
                     android:padding="8dp"
-                    android:textColor="#ffffff" />
+                    android:text="Name"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
+
                 <TextView
                     android:id="@+id/profileName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="14sp"
+                    android:layout_weight="0.3"
+                    android:padding="8dp"
                     android:text="Name"
                     android:textAlignment="textEnd"
-                    android:padding="8dp"
-                    android:textColor="#ffffff" />
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -97,16 +114,17 @@
                     android:text="Email"
                     android:padding="8dp"
                     android:textColor="#ffffff" />
+
                 <TextView
                     android:id="@+id/profileEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="14sp"
+                    android:layout_weight="0.3"
+                    android:padding="8dp"
                     android:text="Email"
                     android:textAlignment="textEnd"
-                    android:padding="8dp"
-                    android:textColor="#ffffff" />
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
             </LinearLayout>
 
 
@@ -127,16 +145,17 @@
                     android:text="Date of birth"
                     android:padding="8dp"
                     android:textColor="#ffffff" />
+
                 <TextView
                     android:id="@+id/profileDob"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="14sp"
+                    android:layout_weight="0.3"
+                    android:padding="8dp"
                     android:text="Dob"
                     android:textAlignment="textEnd"
-                    android:padding="8dp"
-                    android:textColor="#ffffff" />
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -156,16 +175,17 @@
                     android:text="Phone"
                     android:padding="8dp"
                     android:textColor="#ffffff" />
+
                 <TextView
                     android:id="@+id/profilePhone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="14sp"
+                    android:layout_weight="0.3"
+                    android:padding="8dp"
                     android:text="Phone"
                     android:textAlignment="textEnd"
-                    android:padding="8dp"
-                    android:textColor="#ffffff" />
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" />
             </LinearLayout>
 
 
@@ -205,34 +225,17 @@
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/EditBtn"
         style="@android:style/Widget.Button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/button"
+        android:padding="16dp"
         android:text="Edit Profile"
         android:textColor="#3545A8"
         android:textSize="23sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/chipNavigationBarProfile"
-        tools:layout_editor_absoluteX="32dp" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/LogoutBtn"
-        style="@android:style/Widget.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/button"
-        android:text="Logout"
-        android:textColor="#3545A8"
-        android:textSize="23sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/chipNavigationBarProfile"
-        tools:layout_editor_absoluteX="32dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.ismaeldivita.chipnavigation.ChipNavigationBar
         android:id="@+id/chipNavigationBarProfile"

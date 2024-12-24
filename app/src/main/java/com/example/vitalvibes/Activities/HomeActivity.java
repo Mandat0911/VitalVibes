@@ -1,5 +1,6 @@
 package com.example.vitalvibes.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -94,7 +95,56 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
         fetchHospitalData();
+        fetchDonorData();
     }
+
+    private void fetchDonorData() {
+        // Get the FirebaseAuth instance
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
+        // Ensure the user is logged in
+        String userId = auth.getCurrentUser() != null ? auth.getCurrentUser().getUid() : null;
+
+        if (userId == null) {
+            Toast.makeText(HomeActivity.this, "User not authenticated.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Reference to the specific donor's data using their userId
+        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
+
+        // Fetch data for the authenticated user
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // Map the snapshot to a Donor object
+                    Donor user = snapshot.getValue(Donor.class);
+
+                    // Check if the user object and its name are not null
+                    if (user != null && user.getName() != null) {
+                        // Display the donor's name in the text view
+                        binding.textHome.setText("Hi, " +user.getName());
+                    } else {
+                        // Handle missing name or data
+                        Toast.makeText(HomeActivity.this, "Donor data is incomplete.", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // Handle case where no data exists for the user
+                    Toast.makeText(HomeActivity.this, "No donor data found.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle Firebase database error
+                Toast.makeText(HomeActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
 
     private void fetchHospitalData() {
         DatabaseReference myCategory = firebaseDatabase.getReference("Hospital");
@@ -152,7 +202,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initCategory() {
-        DatabaseReference myCategory = firebaseDatabase.getReference("Popular");
+        DatabaseReference myCategory = firebaseDatabase.getReference("Hospital");
         binding.progressBarCategory.setVisibility(View.VISIBLE);
         hospitalsList.clear(); // Clear the list before adding new data
 

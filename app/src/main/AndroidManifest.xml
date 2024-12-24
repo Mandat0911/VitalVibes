@@ -3,15 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +21,9 @@
         android:theme="@style/Theme.VitalVibes"
         tools:targetApi="31">
         <activity
+            android:name=".Activities.EditSiteActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.EditProfileActivity"
             android:exported="false" />
         <activity
@@ -31,8 +31,8 @@
             android:exported="false" />
         <activity
             android:name=".Activities.LocationActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity
             android:name=".Activities.CreateSiteActivity"
             android:exported="false" />
@@ -57,9 +57,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="CLOUDINARY_URL"
-            android:value="cloudinary://541771626282227:4RAEy_XPHb8bvQGlu5HJ4bCOuwg@dcc6xt2mw"/>
+            android:value="cloudinary://541771626282227:4RAEy_XPHb8bvQGlu5HJ4bCOuwg@dcc6xt2mw" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/my_app_api" />

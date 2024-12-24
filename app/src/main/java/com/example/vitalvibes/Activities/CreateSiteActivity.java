@@ -19,6 +19,7 @@ import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.example.vitalvibes.databinding.ActivityCreateSiteBinding;
+import com.example.vitalvibes.model.Hospital;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -217,24 +218,14 @@ public class CreateSiteActivity extends AppCompatActivity {
         }
     }
 
-    private void saveSiteData(String siteName, String address, String startDay, String phoneNumber, String endDay, String bio, ArrayList<String> imageUrls, String ownerUID) {
+    private void saveSiteData(String siteName, String address, String startDay, String mobile, String endDay, String bio, ArrayList<String> imageUrls, String ownerUID) {
         String hospitalId = databaseReference.push().getKey(); // Generate unique hospital ID
         if (hospitalId != null) {
-            // Create a Map to save the site data
-            Map<String, Object> siteData = new HashMap<>();
-            siteData.put("hospitalId", hospitalId);
-            siteData.put("siteName", siteName);
-            siteData.put("address", address);
-            siteData.put("startDate", startDay);
-            siteData.put("endDate", endDay);
-            siteData.put("bio", bio);
-            siteData.put("phoneNumber", phoneNumber);
-            siteData.put("pic", imageUrls); // Save image URLs
-            siteData.put("ownerUID", ownerUID);  // Store the owner's UID
-
+            // Create a Hospital object with the data
+            Hospital hospital = new Hospital(hospitalId,siteName, address, bio, mobile, imageUrls, startDay, endDay, ownerUID);
 
             // Save site data to Firebase Realtime Database
-            databaseReference.child(hospitalId).setValue(siteData)
+            databaseReference.child(hospitalId).setValue(hospital)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(CreateSiteActivity.this, "Site created successfully!", Toast.LENGTH_SHORT).show();
@@ -245,5 +236,6 @@ public class CreateSiteActivity extends AppCompatActivity {
                     });
         }
     }
+
 
 }

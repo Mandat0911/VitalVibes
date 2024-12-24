@@ -62,13 +62,14 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Donor user = snapshot.getValue(Donor.class);
-                    if (user != null) {
+                    Donor donor = snapshot.getValue(Donor.class);
+                    if (donor != null) {
                         // Bind data to UI using binding
-                        binding.profileName.setText(user.getName());
-                        binding.profileEmail.setText(user.getEmail());
-                        binding.profilePhone.setText(user.getPhoneNumber());
-                        binding.profileDob.setText(user.getDob());
+                        binding.profileName.setText(donor.getName());
+                        binding.profileEmail.setText(donor.getEmail());
+                        binding.profilePhone.setText(donor.getPhoneNumber());
+                        binding.profileDob.setText(donor.getDob());
+                        binding.profileBloodType.setText(donor.getBloodType());
                     }
                 } else {
                     Toast.makeText(ProfileActivity.this, "User data not found.", Toast.LENGTH_SHORT).show();

@@ -73,6 +73,54 @@
                         app:layout_constraintBottom_toBottomOf="@+id/mainPic"
                         app:srcCompat="@drawable/gradient_white_bg" />
 
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/DeleteSiteBtn"
+                        style="@android:style/Widget.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/delete_blue_bg_btn"
+                        android:padding="16dp"
+                        android:text="Delete"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/EditSiteBtn"
+                        style="@android:style/Widget.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/blue_bg_btn"
+                        android:padding="16dp"
+                        android:text="Edit"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/DeleteSiteBtn" />
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/DonorSiteBtn"
+                        style="@android:style/Widget.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/green_bg_btn"
+                        android:padding="16dp"
+                        android:text="Donor"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/EditSiteBtn" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
