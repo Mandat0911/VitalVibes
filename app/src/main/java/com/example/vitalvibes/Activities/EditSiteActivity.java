@@ -18,6 +18,7 @@ import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
 import com.example.vitalvibes.databinding.ActivityEditSiteBinding;
 import com.example.vitalvibes.model.Hospital;
+import com.example.vitalvibes.model.Notification;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -237,6 +238,7 @@ public class EditSiteActivity extends AppCompatActivity {
     }
 
     private void saveUpdatedData(String siteName, String address, String startDay, String phoneNumber, String endDay, String bio, ArrayList<String> updatedImageUrls) {
+        DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
         currentHospital.setSiteName(siteName);
         currentHospital.setAddress(address);
         currentHospital.setStartDate(startDay);
@@ -248,8 +250,25 @@ public class EditSiteActivity extends AppCompatActivity {
         databaseReference.child(hospitalId).setValue(currentHospital)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(EditSiteActivity.this, "Site updated successfully!", Toast.LENGTH_SHORT).show();
+
+                        // Create a notification
+                        String notificationId = notificationsRef.push().getKey();
+                        Notification notification = new Notification(
+                                notificationId,
+                                "Site Edited",
+                                "The site " + siteName + " has been edited.",
+                                System.currentTimeMillis(),
+                                false
+                        );
                         finish();
+                        // Save the notification to the database
+                        notificationsRef.child(notificationId).setValue(notification).addOnCompleteListener(notificationTask -> {
+                            if (notificationTask.isSuccessful()) {
+                                Log.d("Notification", "Notification added to database successfully.");
+                            } else {
+                                Log.e("NotificationError", "Failed to add notification to database.");
+                            }
+                        });
                     } else {
                         Toast.makeText(EditSiteActivity.this, "Failed to update site", Toast.LENGTH_SHORT).show();
                     }

@@ -16,18 +16,17 @@ import com.example.vitalvibes.databinding.ViewholderNearbyHospitalBinding;
 import com.example.vitalvibes.model.Hospital;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.Viewholder> {
-    private ArrayList<Hospital> hospitalsList;
-    private ArrayList<Hospital> hospitalsListFiltered; // For filtered list
+    private ArrayList<Hospital> hospitalsList; // Master list
+    private ArrayList<Hospital> hospitalsListFiltered; // For filtered view
     private Context context;
-    private ViewholderNearbyHospitalBinding binding;
 
     public HosptalListAdapter(ArrayList<Hospital> hospitalsList) {
         if (hospitalsList != null) {
-            this.hospitalsList = hospitalsList;
-            this.hospitalsListFiltered = new ArrayList<>(hospitalsList); // Make a copy for filtering
+            this.hospitalsList = new ArrayList<>(new HashSet<>(hospitalsList)); // Remove duplicates initially
+            this.hospitalsListFiltered = new ArrayList<>(this.hospitalsList); // Copy for filtering
         } else {
             this.hospitalsList = new ArrayList<>();
             this.hospitalsListFiltered = new ArrayList<>();
@@ -36,94 +35,99 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
 
     @NonNull
     @Override
-    public HosptalListAdapter.Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = ViewholderNearbyHospitalBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+    public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ViewholderNearbyHospitalBinding binding = ViewholderNearbyHospitalBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
         context = parent.getContext();
         return new Viewholder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Viewholder holder, int position) {
-        if (hospitalsListFiltered != null && !hospitalsListFiltered.isEmpty()) {
-            Hospital hospital = hospitalsListFiltered.get(position); // Get the filtered list of hospitals
+        Hospital hospital = hospitalsListFiltered.get(position);
 
-            binding.nameHospital.setText(hospital.getSiteName());
-            binding.address.setText(hospital.getAddress());
-            binding.HospitalPhoneNumber.setText(hospital.getMobile());  // Modify as per distance logic if needed
-            binding.detailDescription.setText(hospital.getHospitalBio());
+        // Bind data to the UI
+        holder.binding.nameHospital.setText(hospital.getSiteName());
+        holder.binding.address.setText(hospital.getAddress());
+        holder.binding.HospitalPhoneNumber.setText(hospital.getMobile());
+        holder.binding.detailDescription.setText(hospital.getHospitalBio());
 
-            // Check if hospital has images and load the first one using Glide
-            if (hospital.getPic() != null && !hospital.getPic().isEmpty()) {
-                Glide.with(context)
-                        .load(hospital.getPic().get(0)) // Load the first picture if available
-                        .into(binding.pic);
-            } else {
-                // Handle case where no picture is available (optional)
-                Glide.with(context)
-                        .load(R.drawable.ic_launcher_background) // Set a default image if no picture is available
-                        .into(binding.pic);
-            }
-
-            holder.itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(context, HospitalDetail.class);
-                intent.putExtra("object", hospital); // Pass hospital object to detail screen
-                context.startActivity(intent);
-            });
+        if (hospital.getPic() != null && !hospital.getPic().isEmpty()) {
+            Glide.with(context)
+                    .load(hospital.getPic().get(0))
+                    .into(holder.binding.pic);
+        } else {
+            Glide.with(context)
+                    .load(R.drawable.ic_launcher_background)
+                    .into(holder.binding.pic);
         }
+
+        // Handle item click
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, HospitalDetail.class);
+            intent.putExtra("object", hospital);
+            context.startActivity(intent);
+        });
     }
 
     @Override
     public int getItemCount() {
-        return hospitalsListFiltered != null ? hospitalsListFiltered.size() : 0; // Safely return filtered list size
+        return hospitalsListFiltered.size();
     }
 
-    public void filter(String query) {
-        if (hospitalsList != null && !hospitalsList.isEmpty()) {
-            hospitalsListFiltered.clear();
-
-            if (query.isEmpty()) {
-                // If query is empty, show all hospitals
-                hospitalsListFiltered.addAll(hospitalsList);
-            } else {
-                query = query.toLowerCase();
-
-                for (Hospital hospital : hospitalsList) {
-                    String siteName = hospital.getSiteName();
-                    String address = hospital.getAddress();
-
-                    // Add null checks before applying the filter
-                    boolean matchesSiteName = siteName != null && siteName.toLowerCase().contains(query);
-                    boolean matchesAddress = address != null && address.toLowerCase().contains(query);
-
-                    if (matchesSiteName || matchesAddress) {
-                        hospitalsListFiltered.add(hospital); // Add matching hospitals
-                    }
-                }
-            }
-            notifyDataSetChanged(); // Notify adapter about data change
+    // Add a new hospital (prevents duplicates by checking the ID)
+    public void addHospital(Hospital hospital) {
+        if (hospital != null && !containsHospital(hospital)) {
+            hospitalsList.add(hospital);
+            hospitalsListFiltered.add(hospital);
+            notifyItemInserted(hospitalsListFiltered.size() - 1);
         }
     }
 
-    public void removeItem(int position) {
-        // Remove the hospital from the list
-        if (position >= 0 && position < hospitalsListFiltered.size()) {
-            hospitalsListFiltered.remove(position);
-            notifyItemRemoved(position); // Notify adapter about the removed item
-        }
-    }
-    // Method to find the position of the hospital in the list (you can customize this based on your data)
-    private int getHospitalPosition(String hospitalId) {
+    // Remove a hospital
+    public void removeHospital(String hospitalId) {
         for (int i = 0; i < hospitalsListFiltered.size(); i++) {
             if (hospitalsListFiltered.get(i).getHospitalId().equals(hospitalId)) {
-                return i;
+                hospitalsList.remove(hospitalsListFiltered.get(i));
+                hospitalsListFiltered.remove(i);
+                notifyItemRemoved(i);
+                break;
             }
         }
-        return -1; // Return -1 if the hospital was not found
+    }
+
+    // Filter hospitals based on query
+    public void filter(String query) {
+        hospitalsListFiltered.clear();
+        if (query.isEmpty()) {
+            hospitalsListFiltered.addAll(hospitalsList);
+        } else {
+            for (Hospital hospital : hospitalsList) {
+                if (hospital.getSiteName() != null && hospital.getSiteName().toLowerCase().contains(query.toLowerCase())
+                        || hospital.getAddress() != null && hospital.getAddress().toLowerCase().contains(query.toLowerCase())) {
+                    hospitalsListFiltered.add(hospital);
+                }
+            }
+        }
+        //notifyDataSetChanged();
+    }
+
+    // Check if a hospital is already in the list
+    private boolean containsHospital(Hospital hospital) {
+        for (Hospital h : hospitalsList) {
+            if (h.getHospitalId().equals(hospital.getHospitalId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public class Viewholder extends RecyclerView.ViewHolder {
+        ViewholderNearbyHospitalBinding binding;
+
         public Viewholder(ViewholderNearbyHospitalBinding binding) {
             super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }

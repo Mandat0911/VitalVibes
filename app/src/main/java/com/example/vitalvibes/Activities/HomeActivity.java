@@ -72,6 +72,8 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        binding.Notification.setOnClickListener(v -> navigateToActivity(NotificationActivity.class));
+
         // Initialize ChipNavigationBar
         chipNavigationBar = findViewById(R.id.chipNavigationBar);
         setUpChipNavigationBar();
@@ -90,7 +92,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 // Filter the hospital list based on the query text
-                //adapter.filter(newText);
+                adapter.filter(newText);
                 return false;
             }
         });
@@ -143,8 +145,6 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     private void fetchHospitalData() {
         DatabaseReference myCategory = firebaseDatabase.getReference("Hospital");

@@ -21,6 +21,9 @@
         android:theme="@style/Theme.VitalVibes"
         tools:targetApi="31">
         <activity
+            android:name=".Activities.NotificationActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.EditSiteActivity"
             android:exported="false" />
         <activity

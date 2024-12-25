@@ -3,6 +3,7 @@ package com.example.vitalvibes.Activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import com.example.vitalvibes.Adapter.PicListAdapter;
 import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityHospitalDetailBinding;
 import com.example.vitalvibes.model.Hospital;
+import com.example.vitalvibes.model.Notification;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -153,12 +155,29 @@ public class HospitalDetail extends AppCompatActivity {
     // Method to delete the site
     private void deleteSite() {
         String hospitalId = object.getHospitalId(); // Get the hospital ID from the object
-        System.out.println(hospitalId);
+        DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
+
         databaseReference.child(hospitalId).removeValue()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(HospitalDetail.this, "Site deleted successfully!", Toast.LENGTH_SHORT).show();
+                        // Create a notification
+                        String notificationId = notificationsRef.push().getKey();
+                        Notification notification = new Notification(
+                                notificationId,
+                                "Site Deleted",
+                                "The site " + object.getSiteName() + " has been deleted.",
+                                System.currentTimeMillis(),
+                                false
+                        );
                         finish(); // Close the activity after successful deletion
+                        // Save the notification to the database
+                        notificationsRef.child(notificationId).setValue(notification).addOnCompleteListener(notificationTask -> {
+                            if (notificationTask.isSuccessful()) {
+                                Log.d("Notification", "Notification added to database successfully.");
+                            } else {
+                                Log.e("NotificationError", "Failed to add notification to database.");
+                            }
+                        });
                     } else {
                         Toast.makeText(HospitalDetail.this, "Failed to delete site", Toast.LENGTH_SHORT).show();
                     }

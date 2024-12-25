@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +67,7 @@ public class CreateSiteActivity extends AppCompatActivity {
     }
 
     private void createSite() {
+        binding.progressBarSite.setVisibility(View.VISIBLE);
         String siteName = binding.SiteName.getText().toString().trim();
         String address = binding.SiteAddress.getText().toString().trim();
         String startDay = binding.SiteStartDay.getText().toString().trim();
@@ -229,6 +231,7 @@ public class CreateSiteActivity extends AppCompatActivity {
     }
 
     private void saveSiteData(String siteName, String address, String startDay, String mobile, String endDay, String bio, ArrayList<String> imageUrls, String ownerUID) {
+
         String hospitalId = databaseReference.push().getKey(); // Generate unique hospital ID
         if (hospitalId != null) {
             // Create a Hospital object with the data
@@ -240,6 +243,7 @@ public class CreateSiteActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(CreateSiteActivity.this, "Site created successfully!", Toast.LENGTH_SHORT).show();
                             finish(); // Close the activity after successful creation
+                            binding.progressBarSite.setVisibility(View.GONE);
                         } else {
                             Toast.makeText(CreateSiteActivity.this, "Failed to create site", Toast.LENGTH_SHORT).show();
                         }
