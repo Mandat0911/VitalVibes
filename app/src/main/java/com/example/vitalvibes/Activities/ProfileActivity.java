@@ -118,12 +118,12 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
     private void logout() {
-        auth.signOut();
+        FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
         startActivity(intent);
-        finish(); // Close the current activity
         Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show();
     }
+
 
 }

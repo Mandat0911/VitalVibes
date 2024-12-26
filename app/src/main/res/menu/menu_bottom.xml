@@ -33,4 +33,12 @@
         app:cnb_backgroundColor="@color/black"
         app:cnb_iconColor="@color/white"
         />
+
+    <item
+        android:id="@+id/users"
+        android:icon="@drawable/bottom_btn4"
+        android:title="User"
+        app:cnb_backgroundColor="@color/black"
+        app:cnb_iconColor="@color/white"
+        />
 </menu>

@@ -7,12 +7,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 
 import com.bumptech.glide.Glide;
 import com.example.vitalvibes.Adapter.PicListAdapter;
@@ -21,8 +18,11 @@ import com.example.vitalvibes.databinding.ActivityHospitalDetailBinding;
 import com.example.vitalvibes.model.Hospital;
 import com.example.vitalvibes.model.Notification;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -70,6 +70,7 @@ public class HospitalDetail extends AppCompatActivity {
     }
 
     private void setVariable(){
+
         binding.TitleDetail.setText(object.getSiteName());
         binding.phoneDetail.setText(object.getMobile());
         binding.descriptionDetail.setText(object.getHospitalBio());
@@ -81,25 +82,43 @@ public class HospitalDetail extends AppCompatActivity {
         // Check if the current user is the owner
         String ownerUID = object.getOwnerUID(); // Get ownerUID from the hospital object
         String currentUserUID = mAuth.getCurrentUser().getUid(); // Get current user UID
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("Donors").child(currentUserUID);
 
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Check if the current user is an admin
+                boolean isAdmin = dataSnapshot.child("role").getValue(String.class).equals("Admin");
 
-        if (currentUserUID.equals(ownerUID)) {
-            // Show the delete button only if the current user is the owner
-            binding.DeleteSiteBtn.setVisibility(View.VISIBLE);
-            binding.EditSiteBtn.setVisibility(View.VISIBLE);
-            binding.DonorSiteBtn.setVisibility(View.GONE);
+                // Now check if the current user is the owner or an admin
+                if (currentUserUID.equals(ownerUID) || isAdmin) {
+                    // Show the delete and edit buttons if the user is the owner or admin
+                    binding.DeleteSiteBtn.setVisibility(View.VISIBLE);
+                    binding.EditSiteBtn.setVisibility(View.VISIBLE);
+                    binding.DonorSiteBtn.setVisibility(View.GONE);
 
-            // Handle delete button click
-            binding.DeleteSiteBtn.setOnClickListener(v -> deleteSite());
-        } else {
-            // Hide the delete button if the current user is not the owner
-            binding.DeleteSiteBtn.setVisibility(View.GONE);
-            binding.EditSiteBtn.setVisibility(View.GONE);
-            binding.DonorSiteBtn.setVisibility(View.VISIBLE);
-            checkFollowStatus(currentUserUID);
-            binding.DonorSiteBtn.setOnClickListener(v -> toggleFollow(currentUserUID));
-        
-        }
+                    // Handle delete button click
+                    binding.DeleteSiteBtn.setOnClickListener(v -> deleteSite());
+                } else {
+                    // Hide the delete and edit buttons if the user is not the owner or admin
+                    binding.DeleteSiteBtn.setVisibility(View.GONE);
+                    binding.EditSiteBtn.setVisibility(View.GONE);
+                    binding.DonorSiteBtn.setVisibility(View.VISIBLE);
+
+                    // Check if the user is following the site
+                    checkFollowStatus(currentUserUID);
+
+                    // Handle donor site button click (for following/unfollowing)
+                    binding.DonorSiteBtn.setOnClickListener(v -> toggleFollow(currentUserUID));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Handle error
+                Toast.makeText(getApplicationContext(), "Error checking user role", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Toggle follow/unfollow status
@@ -155,44 +174,29 @@ public class HospitalDetail extends AppCompatActivity {
     // Method to delete the site
     private void deleteSite() {
         String hospitalId = object.getHospitalId(); // Get the hospital ID from the object
-        DatabaseReference donorFollowsRef = FirebaseDatabase.getInstance().getReference("DonorFollows");
         DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
         databaseReference.child(hospitalId).removeValue()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Notify donors who follow the site
-                        donorFollowsRef.orderByChild(hospitalId).equalTo(true)
-                                .get()
-                                .addOnCompleteListener(donorTask -> {
-                                    if (donorTask.isSuccessful() && donorTask.getResult().exists()) {
-                                        donorTask.getResult().getChildren().forEach(donor -> {
-                                            String donorId = donor.getKey();
-                                            String notificationId = notificationsRef.push().getKey();
-                                            Notification notification = new Notification(
-                                                    notificationId,
-                                                    "Site Deleted",
-                                                    "The site " + object.getSiteName() + " has been deleted.",
-                                                    System.currentTimeMillis(),
-                                                    false
-                                            );
-                                            // Save the notification to the database
-                                            notificationsRef.child(donorId).child(notificationId).setValue(notification)
-                                                    .addOnCompleteListener(notificationTask -> {
-                                                        if (notificationTask.isSuccessful()) {
-                                                            Log.d("Notification", "Notification sent to donor: " + donorId);
-                                                        } else {
-                                                            Log.e("NotificationError", "Failed to notify donor: " + donorId);
-                                                        }
-                                                    });
-                                        });
-                                    } else {
-                                        Log.d("DonorNotification", "No donors found following this site.");
-                                    }
-                                });
-
-                        Toast.makeText(HospitalDetail.this, "Site deleted successfully", Toast.LENGTH_SHORT).show();
+                        // Create a notification
+                        String notificationId = notificationsRef.push().getKey();
+                        Notification notification = new Notification(
+                                notificationId,
+                                "Site Deleted",
+                                "The site " + object.getSiteName() + " has been deleted.",
+                                System.currentTimeMillis(),
+                                false
+                        );
                         finish(); // Close the activity after successful deletion
+                        // Save the notification to the database
+                        notificationsRef.child(notificationId).setValue(notification).addOnCompleteListener(notificationTask -> {
+                            if (notificationTask.isSuccessful()) {
+                                Log.d("Notification", "Notification added to database successfully.");
+                            } else {
+                                Log.e("NotificationError", "Failed to add notification to database.");
+                            }
+                        });
                     } else {
                         Toast.makeText(HospitalDetail.this, "Failed to delete site", Toast.LENGTH_SHORT).show();
                     }
@@ -211,7 +215,8 @@ public class HospitalDetail extends AppCompatActivity {
         binding.picListDetail.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
     }
 
-    private void getIntentExtra(){
+    private void getIntentExtra() {
         object = (Hospital) getIntent().getSerializableExtra("object");
     }
+
 }

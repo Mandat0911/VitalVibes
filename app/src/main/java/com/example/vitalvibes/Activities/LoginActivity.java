@@ -7,14 +7,13 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityLoginBinding;
 import com.example.vitalvibes.databinding.ActivityMainBinding;
 import com.example.vitalvibes.model.Donor;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -24,6 +23,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class LoginActivity extends AppCompatActivity {
+    private FirebaseAuth mAuth;
 
     private DatabaseReference databaseReference;
     private ActivityLoginBinding binding;
@@ -32,6 +32,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mAuth = FirebaseAuth.getInstance(); // Initialize FirebaseAuth
+        // Set up register button click listener (optional)
+        binding.HaveNoAccount.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, SignupActivity.class); // Assume RegisterActivity is the registration screen
+            startActivity(intent);
+        });
+
 
         databaseReference = FirebaseDatabase.getInstance().getReference("Donors");
 
@@ -103,4 +111,5 @@ public class LoginActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
     }
+
 }

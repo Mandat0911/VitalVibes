@@ -34,7 +34,6 @@ public class NotificationActivity extends AppCompatActivity {
     private ActivityNotificationBinding binding;
     private NotificationAdapter notificationAdapter;
     private ArrayList<Notification> notificationsList = new ArrayList<>();
-    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
