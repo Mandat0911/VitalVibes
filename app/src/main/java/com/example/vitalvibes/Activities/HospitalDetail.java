@@ -155,34 +155,50 @@ public class HospitalDetail extends AppCompatActivity {
     // Method to delete the site
     private void deleteSite() {
         String hospitalId = object.getHospitalId(); // Get the hospital ID from the object
+        DatabaseReference donorFollowsRef = FirebaseDatabase.getInstance().getReference("DonorFollows");
         DatabaseReference notificationsRef = FirebaseDatabase.getInstance().getReference("Notifications");
 
         databaseReference.child(hospitalId).removeValue()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        // Create a notification
-                        String notificationId = notificationsRef.push().getKey();
-                        Notification notification = new Notification(
-                                notificationId,
-                                "Site Deleted",
-                                "The site " + object.getSiteName() + " has been deleted.",
-                                System.currentTimeMillis(),
-                                false
-                        );
+                        // Notify donors who follow the site
+                        donorFollowsRef.orderByChild(hospitalId).equalTo(true)
+                                .get()
+                                .addOnCompleteListener(donorTask -> {
+                                    if (donorTask.isSuccessful() && donorTask.getResult().exists()) {
+                                        donorTask.getResult().getChildren().forEach(donor -> {
+                                            String donorId = donor.getKey();
+                                            String notificationId = notificationsRef.push().getKey();
+                                            Notification notification = new Notification(
+                                                    notificationId,
+                                                    "Site Deleted",
+                                                    "The site " + object.getSiteName() + " has been deleted.",
+                                                    System.currentTimeMillis(),
+                                                    false
+                                            );
+                                            // Save the notification to the database
+                                            notificationsRef.child(donorId).child(notificationId).setValue(notification)
+                                                    .addOnCompleteListener(notificationTask -> {
+                                                        if (notificationTask.isSuccessful()) {
+                                                            Log.d("Notification", "Notification sent to donor: " + donorId);
+                                                        } else {
+                                                            Log.e("NotificationError", "Failed to notify donor: " + donorId);
+                                                        }
+                                                    });
+                                        });
+                                    } else {
+                                        Log.d("DonorNotification", "No donors found following this site.");
+                                    }
+                                });
+
+                        Toast.makeText(HospitalDetail.this, "Site deleted successfully", Toast.LENGTH_SHORT).show();
                         finish(); // Close the activity after successful deletion
-                        // Save the notification to the database
-                        notificationsRef.child(notificationId).setValue(notification).addOnCompleteListener(notificationTask -> {
-                            if (notificationTask.isSuccessful()) {
-                                Log.d("Notification", "Notification added to database successfully.");
-                            } else {
-                                Log.e("NotificationError", "Failed to add notification to database.");
-                            }
-                        });
                     } else {
                         Toast.makeText(HospitalDetail.this, "Failed to delete site", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
+
 
     private void initList() {
         ArrayList<String> picList = new ArrayList<>(object.getPic());
