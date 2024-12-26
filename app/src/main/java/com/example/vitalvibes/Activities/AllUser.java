@@ -1,14 +1,20 @@
 package com.example.vitalvibes.Activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -27,12 +33,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class AllUser extends AppCompatActivity implements UserListAdapter.OnDeleteUserListener {
 
     private ChipNavigationBar chipNavigationBar;
-
+    private static final int STORAGE_PERMISSION_REQUEST_CODE = 1;
     private ArrayList<Donor> donorsList = new ArrayList<>();
     private UserListAdapter userListAdapter;
     private DatabaseReference databaseReference;
@@ -74,11 +83,79 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
             });
         }
 
+        // Request storage permission if not already granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST_CODE);
+        }
+
+        // Set up export button
+        binding.UserExpertBtn.setOnClickListener(v -> exportDonorData());
+
         chipNavigationBar = findViewById(R.id.chipNavigationBar);
         setUpChipNavigationBar();
         setupRecylerView();
         fetchDonorData();
     }
+
+    private void exportDonorData() {
+        if (donorsList.isEmpty()) {
+            Toast.makeText(this, "No data to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Use app-specific directory on external storage
+        File exportDir = new File(getExternalFilesDir(null), "DonorData");
+        if (!exportDir.exists()) {
+            exportDir.mkdirs();
+        }
+
+        File file = new File(exportDir, "Donors.csv");
+        try (FileWriter writer = new FileWriter(file)) {
+            // Write CSV header
+            writer.append("ID,Name,Email,Phone,Role\n");
+
+            // Write donor data
+            for (Donor donor : donorsList) {
+                writer.append(donor.getUserId()).append(",")
+                        .append(donor.getName()).append(",")
+                        .append(donor.getEmail()).append(",")
+                        .append(donor.getPhoneNumber()).append(",")
+                        .append(donor.getRole()).append("\n");
+            }
+
+            writer.flush();
+            Toast.makeText(this, "Data exported to " + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
+
+            // Optionally, share the file
+            shareExportedFile(file);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error exporting data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void shareExportedFile(File file) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/csv");
+        intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Donor Data Export");
+        startActivity(Intent.createChooser(intent, "Share Donor Data"));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Storage permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void fetchDonorData() {
         binding.progressBarUser.setVisibility(View.VISIBLE);
