@@ -6,20 +6,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.example.vitalvibes.Adapter.UserListAdapter;
 import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityAllUserBinding;
@@ -32,7 +25,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -54,8 +46,6 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
         super.onCreate(savedInstanceState);
         binding = ActivityAllUserBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
 
         // Initialize Firebase Database
         databaseReference = firebaseDatabase.getReference("Donors");
@@ -155,7 +145,6 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
             }
         }
     }
-
 
     private void fetchDonorData() {
         binding.progressBarUser.setVisibility(View.VISIBLE);

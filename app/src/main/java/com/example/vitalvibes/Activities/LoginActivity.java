@@ -4,16 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityLoginBinding;
-import com.example.vitalvibes.databinding.ActivityMainBinding;
 import com.example.vitalvibes.model.Donor;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

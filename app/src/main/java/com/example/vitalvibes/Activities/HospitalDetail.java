@@ -68,7 +68,6 @@ public class HospitalDetail extends AppCompatActivity {
         setVariable();
         initList();
     }
-
     private void setVariable(){
 
         binding.TitleDetail.setText(object.getSiteName());

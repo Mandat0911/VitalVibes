@@ -7,7 +7,6 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;

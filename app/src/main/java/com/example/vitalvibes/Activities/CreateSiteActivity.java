@@ -282,7 +282,6 @@ public class CreateSiteActivity extends AppCompatActivity {
             // Set the minimum date for the "End Day"
             dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
         }
-
         dialog.show();
     }
 

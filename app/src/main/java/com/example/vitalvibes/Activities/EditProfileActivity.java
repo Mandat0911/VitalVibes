@@ -5,16 +5,9 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityEditProfileBinding;
 import com.example.vitalvibes.model.Donor;
 import com.google.firebase.auth.FirebaseAuth;
@@ -23,7 +16,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -107,7 +99,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 Toast.makeText(EditProfileActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     private void updateProfileData() {
@@ -184,7 +175,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void setUpListener() {
         binding.backBtnDetailEdit.setOnClickListener(v -> navigateToActivity(ProfileActivity.class));
-
     }
 
     private void navigateToActivity(Class<?> targetActivity) {
@@ -192,6 +182,5 @@ public class EditProfileActivity extends AppCompatActivity {
         // Add flags to clear the back stack
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-//        finish(); // Ensure the current activity is finished
     }
 }

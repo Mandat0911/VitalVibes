@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityLocationBinding;
+import com.example.vitalvibes.model.Donor;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -29,6 +31,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 import java.io.IOException;
@@ -42,6 +51,9 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     Location currentLocation;
     FusedLocationProviderClient fusedLocationProviderClient;
     private GoogleMap map;
+    private DatabaseReference databaseReference;
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private String userRole;
     private ActivityLocationBinding binding;
     private SupportMapFragment mapFragment;
 
@@ -68,7 +80,31 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
             binding.mapSearch.setQuery(location, false);
             searchMapFromHospital(location);
         }
+        String userId;
+        // Initialize Firebase Database
+        databaseReference = firebaseDatabase.getReference("Donors");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null){
+            userId = currentUser.getUid();
+            // Fetch user role from the database
+            databaseReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Donor donor = dataSnapshot.getValue(Donor.class);
+                        if (donor != null) {
+                            userRole = donor.getRole();  // Store the role
+                            displayRoleBasedUI(userRole);
+                        }
+                    }
+                }
 
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Toast.makeText(LocationActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
         // Set up listener for the button to open Google Maps
         binding.btnOpenGoogleMaps.setOnClickListener(v -> openInGoogleMaps());
 
@@ -290,5 +326,15 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void displayRoleBasedUI(String role) {
+        if ("Donor".equals(role)) {
+            // Display Admin features
+            showDonorFeature();
+        }
+    }
+    private void showDonorFeature() {
+        chipNavigationBar.findViewById(R.id.users).setVisibility(View.GONE);
     }
 }

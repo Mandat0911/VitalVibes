@@ -2,25 +2,14 @@ package com.example.vitalvibes.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.vitalvibes.Adapter.NotificationAdapter;
-import com.example.vitalvibes.R;
-import com.example.vitalvibes.databinding.ActivityHomeBinding;
 import com.example.vitalvibes.databinding.ActivityNotificationBinding;
 import com.example.vitalvibes.model.Notification;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

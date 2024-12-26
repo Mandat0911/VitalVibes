@@ -2,14 +2,8 @@ package com.example.vitalvibes.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
-import com.example.vitalvibes.R;
 import com.example.vitalvibes.databinding.ActivityMainBinding;
-import com.google.android.material.chip.Chip;
-import com.ismaeldivita.chipnavigation.ChipNavigationBar;
 
 public class MainActivity extends AppCompatActivity {
     // Define constants for menu IDs

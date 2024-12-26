@@ -8,11 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
@@ -25,24 +23,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 public class EditSiteActivity extends AppCompatActivity {
-    private Calendar startDate;
     private static final String TAG = "EditSite";
     private static final int IMAGE_REQ = 1;
     private static int selectedImageSlot = 0; // Track which image slot is selected (1, 2, or 3)
     private static final String CLOUD_API_KEY = "541771626282227";
     private static final String CLOUD_NAME = "dcc6xt2mw";
     private static final String CLOUD_API_SECRET = "4RAEy_XPHb8bvQGlu5HJ4bCOuwg";
-
     private ActivityEditSiteBinding binding;
     private DatabaseReference databaseReference;
-
     private String hospitalId; // The ID of the hospital to edit
     private Hospital currentHospital; // Store the current hospital data
     private final ArrayList<Uri> newImageUris = new ArrayList<>(); // New images selected by the user
@@ -66,8 +60,6 @@ public class EditSiteActivity extends AppCompatActivity {
             finish();
             return;
         }
-
-
         initConfig();
         loadSiteData();
         setupImageClickListeners();
@@ -306,7 +298,6 @@ public class EditSiteActivity extends AppCompatActivity {
             // Set the minimum date for the "End Day"
             dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
         }
-
         dialog.show();
     }
 

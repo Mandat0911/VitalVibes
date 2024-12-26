@@ -1,7 +1,5 @@
 package com.example.vitalvibes.model;
 
-import java.util.Date;
-
 public class Donor {
 
     private String userId;
