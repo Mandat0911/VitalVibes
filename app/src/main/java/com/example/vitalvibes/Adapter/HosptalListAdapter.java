@@ -69,7 +69,7 @@ public class HosptalListAdapter extends RecyclerView.Adapter<HosptalListAdapter.
 
     @Override
     public int getItemCount() {
-        return hospitalsList.size();
+        return hospitalsListFiltered.size();
     }
 
 

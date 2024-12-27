@@ -76,7 +76,14 @@ public class CreateSiteActivity extends AppCompatActivity {
         String bio = binding.SiteDescription.getText().toString().trim();
 
         // Get the current user's UID (owner)
-        String ownerUID = mAuth.getCurrentUser().getUid();
+        String ownerUID;
+        try {
+            ownerUID = mAuth.getCurrentUser().getUid();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error fetching user information. Please log in again.", Toast.LENGTH_SHORT).show();
+            return; // Exit the function as the UID is essential
+        }
+
 
 
         if (siteName.isEmpty() || address.isEmpty() || startDay.isEmpty() || phoneNumber.isEmpty() || bio.isEmpty()) {
@@ -160,16 +167,20 @@ public class CreateSiteActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == IMAGE_REQ && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                if (data.getClipData() != null) { // Multiple images selected
-                    Uri imageUri = data.getClipData().getItemAt(0).getUri(); // Pick the first image for simplicity
-                    imagePath.add(imageUri); // Add the image to the list
-                    displaySelectedImage(imageUri);
-                } else if (data.getData() != null) { // Single image selected
-                    Uri imageUri = data.getData();
-                    imagePath.add(imageUri); // Add the image to the list
-                    displaySelectedImage(imageUri);
+            try {
+                if (data != null) {
+                    if (data.getClipData() != null) { // Multiple images selected
+                        Uri imageUri = data.getClipData().getItemAt(0).getUri(); // Pick the first image for simplicity
+                        imagePath.add(imageUri); // Add the image to the list
+                        displaySelectedImage(imageUri);
+                    } else if (data.getData() != null) { // Single image selected
+                        Uri imageUri = data.getData();
+                        imagePath.add(imageUri); // Add the image to the list
+                        displaySelectedImage(imageUri);
+                    }
                 }
+            }catch (Exception e) {
+                Toast.makeText(this, "Error selecting image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -197,36 +208,41 @@ public class CreateSiteActivity extends AppCompatActivity {
 
         ArrayList<String> imageUrls = new ArrayList<>();
         for (Uri imageUri : imagePath) {
-            MediaManager.get().upload(imageUri).callback(new UploadCallback() {
-                @Override
-                public void onStart(String requestId) {
-                    Log.d(TAG, "onStart: Upload started for " + requestId);
-                }
-
-                @Override
-                public void onProgress(String requestId, long bytes, long totalBytes) {
-                    Log.d(TAG, "onProgress: Uploading " + requestId);
-                }
-
-                @Override
-                public void onSuccess(String requestId, Map resultData) {
-                    String imageUrl = (String) resultData.get("secure_url");
-                    imageUrls.add(imageUrl); // Add the uploaded image URL to the list
-                    if (imageUrls.size() == imagePath.size()) {
-                        saveSiteData(siteName, address, startDay, phoneNumber, endDay, bio, imageUrls, ownerUID);
+            try {
+                MediaManager.get().upload(imageUri).callback(new UploadCallback() {
+                    @Override
+                    public void onStart(String requestId) {
+                        Log.d(TAG, "onStart: Upload started for " + requestId);
                     }
-                }
 
-                @Override
-                public void onError(String requestId, ErrorInfo error) {
-                    Log.d(TAG, "onError: Upload failed for " + requestId + " with error: " + error.getDescription());
-                }
+                    @Override
+                    public void onProgress(String requestId, long bytes, long totalBytes) {
+                        Log.d(TAG, "onProgress: Uploading " + requestId);
+                    }
 
-                @Override
-                public void onReschedule(String requestId, ErrorInfo error) {
-                    Log.d(TAG, "onReschedule: Upload rescheduled for " + requestId);
-                }
-            }).dispatch();
+                    @Override
+                    public void onSuccess(String requestId, Map resultData) {
+                        String imageUrl = (String) resultData.get("secure_url");
+                        imageUrls.add(imageUrl); // Add the uploaded image URL to the list
+                        if (imageUrls.size() == imagePath.size()) {
+                            saveSiteData(siteName, address, startDay, phoneNumber, endDay, bio, imageUrls, ownerUID);
+                        }
+                    }
+
+                    @Override
+                    public void onError(String requestId, ErrorInfo error) {
+                        Log.d(TAG, "onError: Upload failed for " + requestId + " with error: " + error.getDescription());
+                    }
+
+                    @Override
+                    public void onReschedule(String requestId, ErrorInfo error) {
+                        Log.d(TAG, "onReschedule: Upload rescheduled for " + requestId);
+                    }
+                }).dispatch();
+            } catch (Exception e) {
+                Log.e(TAG, "Image upload failed: " + e.getMessage());
+                Toast.makeText(this, "Image upload failed. Please try again.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -238,16 +254,20 @@ public class CreateSiteActivity extends AppCompatActivity {
             Hospital hospital = new Hospital(hospitalId,siteName, address, bio, mobile, imageUrls, startDay, endDay, ownerUID);
 
             // Save site data to Firebase Realtime Database
-            databaseReference.child(hospitalId).setValue(hospital)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(CreateSiteActivity.this, "Site created successfully!", Toast.LENGTH_SHORT).show();
-                            finish(); // Close the activity after successful creation
-                            binding.progressBarSite.setVisibility(View.GONE);
-                        } else {
-                            Toast.makeText(CreateSiteActivity.this, "Failed to create site", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            try {
+                databaseReference.child(hospitalId).setValue(hospital)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(CreateSiteActivity.this, "Site created successfully!", Toast.LENGTH_SHORT).show();
+                                finish(); // Close the activity
+                                binding.progressBarSite.setVisibility(View.GONE);
+                            } else {
+                                Toast.makeText(CreateSiteActivity.this, "Failed to create site", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } catch (Exception e) {
+                Toast.makeText(this, "Error saving data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -255,15 +275,20 @@ public class CreateSiteActivity extends AppCompatActivity {
         // Get the current date
         Calendar calendar = Calendar.getInstance();
 
-        if (minDateString != null) {
-            // Parse the start date string (e.g., "15/12/2024")
-            String[] dateParts = minDateString.split("/");
-            int day = Integer.parseInt(dateParts[0]);
-            int month = Integer.parseInt(dateParts[1]) - 1; // Month is zero-based
-            int year = Integer.parseInt(dateParts[2]);
+        try {
+            if (minDateString != null) {
+                // Parse the start date string (e.g., "15/12/2024")
+                String[] dateParts = minDateString.split("/");
+                int day = Integer.parseInt(dateParts[0]);
+                int month = Integer.parseInt(dateParts[1]) - 1; // Month is zero-based
+                int year = Integer.parseInt(dateParts[2]);
 
-            // Set the calendar to the selected start date
-            calendar.set(year, month, day);
+                // Set the calendar to the selected start date
+                calendar.set(year, month, day);
+            }
+        }catch (Exception e) {
+            Toast.makeText(this, "Invalid start date format. Please reselect.", Toast.LENGTH_SHORT).show();
+            return; // Exit the function
         }
 
         int currentYear = calendar.get(Calendar.YEAR);

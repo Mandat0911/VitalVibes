@@ -48,24 +48,29 @@ public class NotificationActivity extends AppCompatActivity {
         myNoti.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                notificationsList.clear();
-                if (snapshot.exists()) {
-                    for (DataSnapshot issue : snapshot.getChildren()) {
-                        Notification notification = issue.getValue(Notification.class);
-                        if (notification != null) {
-                            notificationsList.add(notification);
+                try {
+                    notificationsList.clear();
+                    if (snapshot.exists()) {
+                        for (DataSnapshot issue : snapshot.getChildren()) {
+                            Notification notification = issue.getValue(Notification.class);
+                            if (notification != null) {
+                                notificationsList.add(notification);
+                            }
                         }
+                        notificationAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(NotificationActivity.this, "No notifications available.", Toast.LENGTH_SHORT).show();
                     }
-                    notificationAdapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(NotificationActivity.this, "No notifications available.", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(NotificationActivity.this, "Error processing notifications: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                } finally {
+                    binding.progressBarNoti.setVisibility(View.GONE);
                 }
-                binding.progressBarNoti.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(NotificationActivity.this, "Error fetching notifications.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NotificationActivity.this, "Error fetching notifications: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 binding.progressBarNoti.setVisibility(View.GONE);
             }
         });

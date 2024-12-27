@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -63,6 +64,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void signUp() {
+        binding.progressBarSignUp.setVisibility(View.VISIBLE);
         String name = binding.signUpFullName.getText().toString().trim();
         String email = binding.signUpEmailInput.getText().toString().trim();
         String dob = binding.signUpDOBInput.getText().toString().trim();
@@ -73,50 +75,61 @@ public class SignupActivity extends AppCompatActivity {
 
         // Validate inputs
         if (validateInputs(name, email, dob, phoneNumber, password ,confirmPassword,bloodType)) {
-            // Check if email exists in Firebase Auth
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Firebase Authentication successful, create user in Firebase Database
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
+            try {
+                // Check if email exists in Firebase Auth
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this, task -> {
+                            if (task.isSuccessful()) {
+                                // Firebase Authentication successful, create user in Firebase Database
+                                FirebaseUser firebaseUser = mAuth.getCurrentUser();
 
-                            assert firebaseUser != null;
-                            firebaseUser.sendEmailVerification();
-                            String userId = firebaseUser.getUid();  // Get Firebase UID
+                                assert firebaseUser != null;
+                                firebaseUser.sendEmailVerification();
+                                String userId = firebaseUser.getUid();  // Get Firebase UID
 
-                            // Hash the password (optional, you can store password as is)
-                            String hashedPassword = hashPassword(password);
+                                // Hash the password (optional, you can store password as is)
+                                String hashedPassword = hashPassword(password);
 
-                            // Validate Date of Birth
-                            if (!isValidDob(dob)) {
-                                Toast.makeText(this, "Invalid Date of Birth. Valid format is dd/mm/yyyy", Toast.LENGTH_SHORT).show();
-                                return; // Early return if DOB is invalid
+                                // Validate Date of Birth
+                                if (!isValidDob(dob)) {
+                                    Toast.makeText(this, "Invalid Date of Birth. Valid format is dd/mm/yyyy", Toast.LENGTH_SHORT).show();
+                                    return; // Early return if DOB is invalid
+                                }
+
+                                // Default role is "Donor"
+                                String role = "Donor";
+
+                                // Create Donor object
+                                Donor donor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, bloodType ,role);
+
+                                try {
+                                    // Save the Donor object in Firebase Realtime Database
+                                    databaseReference.child(userId).setValue(donor)
+                                            .addOnCompleteListener(task1 -> {
+                                                if (task1.isSuccessful()) {
+                                                    Toast.makeText(this, "Sign-up successful!", Toast.LENGTH_SHORT).show();
+                                                    // Redirect to login page
+                                                    Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    startActivity(intent);
+                                                    finish();
+                                                    binding.progressBarSignUp.setVisibility(View.GONE);
+                                                } else {
+                                                    Toast.makeText(this, "Sign-up failed: " + task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }catch (Exception e) {
+                                    Toast.makeText(this, "Error while saving user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+
+                            } else {
+                                Toast.makeText(SignupActivity.this, "Authentication failed: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
                             }
+                        });
+            }catch (Exception e) {
+                Toast.makeText(SignupActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
 
-                            // Default role is "Donor"
-                            String role = "Donor";
-
-                            // Create Donor object
-                            Donor donor = new Donor(userId, name, email, dob, phoneNumber, hashedPassword, bloodType ,role);
-
-                            // Save the Donor object in Firebase Realtime Database
-                            databaseReference.child(userId).setValue(donor)
-                                    .addOnCompleteListener(task1 -> {
-                                        if (task1.isSuccessful()) {
-                                            Toast.makeText(this, "Sign-up successful!", Toast.LENGTH_SHORT).show();
-                                            // Redirect to login page
-                                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(intent);
-                                            finish();
-                                        } else {
-                                            Toast.makeText(this, "Sign-up failed: " + task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        } else {
-                            Toast.makeText(SignupActivity.this, "Authentication failed: " + Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
         }
     }
 

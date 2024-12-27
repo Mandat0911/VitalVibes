@@ -68,6 +68,7 @@ public class HospitalDetail extends AppCompatActivity {
         setVariable();
         initList();
     }
+
     private void setVariable(){
 
         binding.TitleDetail.setText(object.getSiteName());
@@ -187,6 +188,7 @@ public class HospitalDetail extends AppCompatActivity {
                                 System.currentTimeMillis(),
                                 false
                         );
+                        Toast.makeText(HospitalDetail.this, "Site deleted and notifications sent!", Toast.LENGTH_SHORT).show();
                         finish(); // Close the activity after successful deletion
                         // Save the notification to the database
                         notificationsRef.child(notificationId).setValue(notification).addOnCompleteListener(notificationTask -> {
@@ -201,6 +203,7 @@ public class HospitalDetail extends AppCompatActivity {
                     }
                 });
     }
+
 
 
     private void initList() {

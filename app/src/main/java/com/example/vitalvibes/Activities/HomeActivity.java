@@ -50,9 +50,6 @@ public class HomeActivity extends AppCompatActivity {
 
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-
-
         String userId;
         // Initialize Firebase Database
         databaseReference = firebaseDatabase.getReference("Donors");
@@ -119,68 +116,86 @@ public class HomeActivity extends AppCompatActivity {
             Toast.makeText(HomeActivity.this, "User not authenticated.", Toast.LENGTH_SHORT).show();
             return;
         }
+        try {
+            // Reference to the specific donor's data using their userId
+            DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
 
-        // Reference to the specific donor's data using their userId
-        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
+            // Fetch data for the authenticated user
+            userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        // Map the snapshot to a Donor object
+                        Donor user = snapshot.getValue(Donor.class);
 
-        // Fetch data for the authenticated user
-        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    // Map the snapshot to a Donor object
-                    Donor user = snapshot.getValue(Donor.class);
-
-                    // Check if the user object and its name are not null
-                    if (user != null && user.getName() != null) {
-                        // Display the donor's name in the text view
-                        binding.textHome.setText("Hi, " +user.getName());
+                        // Check if the user object and its name are not null
+                        if (user != null && user.getName() != null) {
+                            // Display the donor's name in the text view
+                            binding.textHome.setText("Hi, " +user.getName());
+                        } else {
+                            // Handle missing name or data
+                            Toast.makeText(HomeActivity.this, "Donor data is incomplete.", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        // Handle missing name or data
-                        Toast.makeText(HomeActivity.this, "Donor data is incomplete.", Toast.LENGTH_SHORT).show();
+                        // Handle case where no data exists for the user
+                        Toast.makeText(HomeActivity.this, "No donor data found.", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    // Handle case where no data exists for the user
-                    Toast.makeText(HomeActivity.this, "No donor data found.", Toast.LENGTH_SHORT).show();
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Handle Firebase database error
-                Toast.makeText(HomeActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    // Handle Firebase database error
+                    Toast.makeText(HomeActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }catch (Exception e) {
+            Log.e("FirebaseError", "Error fetching donor data: " + e.getMessage());
+            Toast.makeText(HomeActivity.this, "Unexpected error occurred.", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     private void fetchHospitalData() {
-        DatabaseReference myCategory = firebaseDatabase.getReference("Hospital");
-        myCategory.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot issue : snapshot.getChildren()) {
-                        Hospital hospital = issue.getValue(Hospital.class);
-                        if (hospital != null) {
-                            hospitalsList.add(hospital);
+        try {
+            DatabaseReference myCategory = firebaseDatabase.getReference("Hospital");
+            myCategory.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot issue : snapshot.getChildren()) {
+                            Hospital hospital = issue.getValue(Hospital.class);
+                            if (hospital != null) {
+                                hospitalsList.add(hospital);
+                            }
                         }
+                        adapter = new HosptalListAdapter(hospitalsList);  // Set the adapter
+                        recyclerView.setAdapter(adapter);
                     }
-                    adapter = new HosptalListAdapter(hospitalsList);  // Set the adapter
-                    recyclerView.setAdapter(adapter);
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(HomeActivity.this, "Error fetching data", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(HomeActivity.this, "Error fetching data", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }catch (Exception e) {
+            Log.e("FirebaseError", "Unexpected error: " + e.getMessage());
+            Toast.makeText(HomeActivity.this, "Unexpected error occurred.", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void navigateToActivity(Class<?> targetActivity) {
-        startActivity(new Intent(HomeActivity.this, targetActivity));
+        try {
+            startActivity(new Intent(HomeActivity.this, targetActivity));
+        } catch (Exception e) {
+            Log.e("NavigationError", "Error navigating to activity: " + e.getMessage());
+            Toast.makeText(HomeActivity.this, "Unable to open activity.", Toast.LENGTH_SHORT).show();
+        }
     }
+
 
     private void setUpChipNavigationBar() {
         chipNavigationBar.setMenuResource(R.menu.menu_bottom);
@@ -248,19 +263,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void displayRoleBasedUI(String role) {
-        if ("Admin".equals(role)) {
-            // Display Admin features
-            showAdminFeatures();
-            initCategory();
-        } else {
-            showDonorFeature();
-            // Display Donor features
-            initCategory();
+        try {
+            if ("Admin".equals(role)) {
+                showAdminFeatures();
+                initCategory();
+            } else {
+                showDonorFeature();
+                initCategory();
+            }
+        } catch (Exception e) {
+            Log.e("UIError", "Error displaying UI for role: " + e.getMessage());
+            Toast.makeText(HomeActivity.this, "Error updating UI.", Toast.LENGTH_SHORT).show();
         }
     }
 
+
     private void showDonorFeature() {
         chipNavigationBar.findViewById(R.id.users).setVisibility(View.GONE);
+        binding.ListSite.setVisibility(View.GONE);
     }
 
     private void showAdminFeatures() {

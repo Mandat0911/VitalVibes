@@ -31,9 +31,18 @@ public class EditProfileActivity extends AppCompatActivity {
         binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        auth = FirebaseAuth.getInstance();
-        String userId = auth.getCurrentUser().getUid();
-        databaseReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
+        String userId;
+        try {
+            userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } catch (Exception e) {
+            Toast.makeText(this, "Error retrieving user ID: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            return; // Stop further processing
+        }
+        try {
+            databaseReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error initializing database reference: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
 
         fetchProfileData();
 
@@ -65,15 +74,20 @@ public class EditProfileActivity extends AppCompatActivity {
         int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
 
         // Initialize the DatePickerDialog with the current date as the default
-        @SuppressLint("SetTextI18n")
-        DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-            // Format the selected date
-            String formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year);
-            binding.updateDOBInput.setText(formattedDate);
-        }, currentYear, currentMonth, currentDay);
+        try {
+            @SuppressLint("SetTextI18n")
+            DatePickerDialog dialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                // Format the selected date
+                String formattedDate = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year);
+                binding.updateDOBInput.setText(formattedDate);
+            }, currentYear, currentMonth, currentDay);
 
-        dialog.show();
+            dialog.show();
+        }catch (Exception e) {
+            Toast.makeText(this, "Error showing date picker: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
+
 
     private void fetchProfileData() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -145,15 +159,20 @@ public class EditProfileActivity extends AppCompatActivity {
         // Reference to the Firebase Database
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
 
-        // Update profile in Firebase Database
-        databaseReference.setValue(updatedDonor).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(EditProfileActivity.this, "Profile updated successfully.", Toast.LENGTH_SHORT).show();
-                finish(); // Close the activity
-            } else {
-                Toast.makeText(EditProfileActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        try {
+            // Update profile in Firebase Database
+            databaseReference.setValue(updatedDonor).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(EditProfileActivity.this, "Profile updated successfully.", Toast.LENGTH_SHORT).show();
+                    finish(); // Close the activity
+                } else {
+                    Toast.makeText(EditProfileActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }catch (Exception e) {
+            Toast.makeText(this, "Error updating profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     // Password hashing method remains unchanged
@@ -178,9 +197,13 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     private void navigateToActivity(Class<?> targetActivity) {
-        Intent intent = new Intent(EditProfileActivity.this, targetActivity);
-        // Add flags to clear the back stack
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+        try {
+            Intent intent = new Intent(EditProfileActivity.this, targetActivity);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Error navigating to activity: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
+
 }

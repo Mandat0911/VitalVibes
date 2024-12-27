@@ -24,8 +24,8 @@ import java.util.Objects;
 
 public class ProfileActivity extends AppCompatActivity {
     private ChipNavigationBar chipNavigationBar;
-    private FirebaseAuth auth;
     private DatabaseReference databaseReference;
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private String userRole;
     private ActivityProfileBinding binding;
@@ -40,15 +40,18 @@ public class ProfileActivity extends AppCompatActivity {
         chipNavigationBar = findViewById(R.id.chipNavigationBarProfile);
         setUpChipNavigationBar();
 
-        auth = FirebaseAuth.getInstance();
-        String userId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
+
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         databaseReference = FirebaseDatabase.getInstance().getReference("Donors").child(userId);
 
         fetchProfileData();
         binding.LogoutBtn.setOnClickListener(v ->
                 {
-                    clearCache();
-                    logout();
+                    auth.signOut();
+                    Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
+                    startActivity(intent);
+                    Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show();
                 }
 
         );
@@ -56,27 +59,30 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Initialize Firebase Database
         databaseReference = firebaseDatabase.getReference("Donors");
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (currentUser != null){
-            userId = currentUser.getUid();
-            // Fetch user role from the database
-            databaseReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Donor donor = dataSnapshot.getValue(Donor.class);
-                        if (donor != null) {
-                            userRole = donor.getRole();  // Store the role
-                            displayRoleBasedUI(userRole);
+        try {
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+            if (currentUser != null){
+                userId = currentUser.getUid();
+                // Fetch user role from the database
+                databaseReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            Donor donor = dataSnapshot.getValue(Donor.class);
+                            if (donor != null) {
+                                userRole = donor.getRole();  // Store the role
+                                displayRoleBasedUI(userRole);
+                            }
                         }
                     }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(ProfileActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Toast.makeText(ProfileActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }catch (Exception e) {
+            Toast.makeText(ProfileActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -90,21 +96,24 @@ public class ProfileActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Donor donor = snapshot.getValue(Donor.class);
-                    if (donor != null) {
-                        // Bind data to UI using binding
-                        binding.profileName.setText(donor.getName());
-                        binding.profileEmail.setText(donor.getEmail());
-                        binding.profilePhone.setText(donor.getPhoneNumber());
-                        binding.profileDob.setText(donor.getDob());
-                        binding.profileBloodType.setText(donor.getBloodType());
+                try {
+                    if (snapshot.exists()) {
+                        Donor donor = snapshot.getValue(Donor.class);
+                        if (donor != null) {
+                            // Bind data to UI using binding
+                            binding.profileName.setText(donor.getName());
+                            binding.profileEmail.setText(donor.getEmail());
+                            binding.profilePhone.setText(donor.getPhoneNumber());
+                            binding.profileDob.setText(donor.getDob());
+                            binding.profileBloodType.setText(donor.getBloodType());
+                        }
+                    } else {
+                        Toast.makeText(ProfileActivity.this, "User data not found.", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(ProfileActivity.this, "User data not found.", Toast.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Toast.makeText(ProfileActivity.this, "Error retrieving profile data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(ProfileActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
@@ -145,13 +154,6 @@ public class ProfileActivity extends AppCompatActivity {
                 navigateToActivity(targetActivity);
             }
         });
-    }
-    private void logout() {
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
-        startActivity(intent);
-        Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show();
     }
     private void displayRoleBasedUI(String role) {
         if ("Donor".equals(role)) {

@@ -1,6 +1,7 @@
 package com.example.vitalvibes.Activities;
 
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -8,6 +9,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -90,15 +92,18 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
             databaseReference.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Donor donor = dataSnapshot.getValue(Donor.class);
-                        if (donor != null) {
-                            userRole = donor.getRole();  // Store the role
-                            displayRoleBasedUI(userRole);
+                    try {
+                        if (dataSnapshot.exists()) {
+                            Donor donor = dataSnapshot.getValue(Donor.class);
+                            if (donor != null) {
+                                userRole = donor.getRole();  // Store the role
+                                displayRoleBasedUI(userRole);
+                            }
                         }
+                    }catch (Exception e) {
+                        Toast.makeText(LocationActivity.this, "Error processing user data", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Toast.makeText(LocationActivity.this, "Error fetching user data", Toast.LENGTH_SHORT).show();
@@ -122,13 +127,20 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             mapIntent.setPackage("com.google.android.apps.maps");
 
-            // Check if Google Maps is installed and start the activity
-            if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(mapIntent);
-            } else {
-                // If Google Maps is not installed, show a message
-                Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show();
+            try {
+                // Check if Google Maps is installed and start the activity
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(mapIntent);
+                } else {
+                    // If Google Maps is not installed, show a message
+                    Toast.makeText(this, "Google Maps is not installed", Toast.LENGTH_SHORT).show();
+                }
+            }catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "Unable to open Google Maps. Please install the app.", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, "Unexpected error occurred while opening Google Maps", Toast.LENGTH_SHORT).show();
             }
+
         } else {
             Toast.makeText(this, "Please enter a valid location", Toast.LENGTH_SHORT).show();
         }
@@ -221,12 +233,16 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
         task.addOnSuccessListener(location -> {
             if (location != null) {
                 currentLocation = location;
-                if (map != null) {
-                    LatLng myPosition = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                    map.moveCamera(CameraUpdateFactory.newLatLng(myPosition));
-                    MarkerOptions options = new MarkerOptions().position(myPosition).title("My Location");
-                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                    map.addMarker(options);
+                try {
+                    if (map != null) {
+                        LatLng myPosition = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                        map.moveCamera(CameraUpdateFactory.newLatLng(myPosition));
+                        MarkerOptions options = new MarkerOptions().position(myPosition).title("My Location");
+                        options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                        map.addMarker(options);
+                    }
+                }catch (Exception e) {
+                    Toast.makeText(this, "Error displaying location on the map", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -329,10 +345,16 @@ public class LocationActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void displayRoleBasedUI(String role) {
-        if ("Donor".equals(role)) {
-            // Display Admin features
-            showDonorFeature();
+        try {
+            if ("Donor".equals(role)) {
+                // Display Admin features
+                showDonorFeature();
+            }
+        }catch (Exception e) {
+            Log.e("UIError", "Error displaying UI for role: " + e.getMessage());
+            Toast.makeText(LocationActivity.this, "Error updating UI.", Toast.LENGTH_SHORT).show();
         }
+
     }
     private void showDonorFeature() {
         chipNavigationBar.findViewById(R.id.users).setVisibility(View.GONE);

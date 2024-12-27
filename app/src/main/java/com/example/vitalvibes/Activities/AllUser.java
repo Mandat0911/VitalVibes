@@ -37,6 +37,7 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
     private ArrayList<Donor> donorsList = new ArrayList<>();
     private UserListAdapter userListAdapter;
     private DatabaseReference databaseReference;
+    private FirebaseAuth auth = FirebaseAuth.getInstance();
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private String userRole;
     private ActivityAllUserBinding binding;
@@ -78,9 +79,19 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_REQUEST_CODE);
         }
+        binding.UserLogoutBtn.setOnClickListener(v ->
+                {
+                    auth.signOut();
+                    Intent intent = new Intent(AllUser.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // Clear back stack
+                    startActivity(intent);
+                    Toast.makeText(this, "Logged out successfully.", Toast.LENGTH_SHORT).show();
+                }
+
+        );
 
         // Set up export button
-        binding.UserExpertBtn.setOnClickListener(v -> exportDonorData());
+        binding.userExpertBtn.setOnClickListener(v -> exportDonorData());
 
         chipNavigationBar = findViewById(R.id.chipNavigationBar);
         setUpChipNavigationBar();
@@ -136,15 +147,21 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Storage permission granted", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
+        try {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            if (requestCode == STORAGE_PERMISSION_REQUEST_CODE) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Storage permission granted", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "Storage permission denied", Toast.LENGTH_SHORT).show();
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "An error occurred during permission handling: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void fetchDonorData() {
         binding.progressBarUser.setVisibility(View.VISIBLE);
@@ -212,11 +229,16 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
     }
 
     private void displayRoleBasedUI(String role) {
-        if ("Admin".equals(role)) {
-            // Display Admin features
-            showAdminFeatures();
+        try {
+            if ("Admin".equals(role)) {
+                showAdminFeatures();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error displaying UI for role: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void showAdminFeatures() {
         // Hide donor-specific UI elements and show admin-specific UI
@@ -233,15 +255,23 @@ public class AllUser extends AppCompatActivity implements UserListAdapter.OnDele
     }
 
     private void deleteUser(String userId) {
-        DatabaseReference donorRef = FirebaseDatabase.getInstance().getReference("Donors");
+        try {
+            DatabaseReference donorRef = FirebaseDatabase.getInstance().getReference("Donors");
 
-        donorRef.child(userId).removeValue()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(AllUser.this, "Delete user successful!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(AllUser.this, "Failed to delete user", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            donorRef.child(userId).removeValue()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(AllUser.this, "Delete user successful!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(AllUser.this, "Failed to delete user", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(AllUser.this, "An error occurred while deleting user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
+
+
+
 }
