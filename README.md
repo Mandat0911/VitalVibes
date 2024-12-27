@@ -1,7 +1,3 @@
-Here's the combined README:  
-
----
-
 # VitalVibe App  
 
 ## **Overview**  
